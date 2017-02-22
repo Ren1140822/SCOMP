@@ -10,7 +10,7 @@
 #include "somar_pares.h"
 
 /*
- * Module 0 - Exercise 3
+ * Module 0 - Exercise 1
  */
 
 #define SIZE 5
