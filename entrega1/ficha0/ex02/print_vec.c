@@ -14,14 +14,14 @@
  */
 void print_vec(int *vec, unsigned int n) 
 {
-	printf("\nThe elements of the vector are:\n{ %d", *vec);
+	printf("\n{");
 	
-	unsigned int i = 1;
-	while(i < n)
+	int i;
+	for (i = 0; i < n; i++)
 	{
-		printf(", %d", *(vec + i));
-		i++;
+		printf("%d%s", vec[i], i != n-1 ? "; ": "");
 	}
 	
-	printf(" }\n");
+	
+	printf("}\n");
 }
