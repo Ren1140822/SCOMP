@@ -12,4 +12,4 @@
  * 
  * 
  */
-void invert_vec(int *vec1,unsigned int n_elements,float *vec_inv);
+int invert_vec(int *vec1,unsigned int n_elements,float *vec_inv);

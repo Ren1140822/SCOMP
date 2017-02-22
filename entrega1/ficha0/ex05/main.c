@@ -20,8 +20,14 @@ int main(void) {
 	 int vec[SIZE] = {5,4,3,2,1};
 	 float vec_inv[SIZE];
 	 
-	 invert_vec(vec,SIZE,vec_inv);
-	  int i;
-	   
+	 int result = invert_vec(vec,SIZE,vec_inv);
+	  
+	  if(result>0)
+	  {
+		print_vec(vec_inv,SIZE);
+	  }
+	  else{
+		  printf("Não foi possivel inverter, um valor era nulo.\n");
+	  }
 	 return 0;
 }

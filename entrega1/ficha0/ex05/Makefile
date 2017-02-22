@@ -6,9 +6,9 @@
 #
 
 # variables
-INCLUDES = invert_vec.h
-SOURCES =  invert_vec.c main.c
-OBJFILES = invert_vec.o main.o 
+INCLUDES =  print_vec.h invert_vec.h
+SOURCES =  print_vec.c invert_vec.c main.c
+OBJFILES = print_vec.o invert_vec.o main.o 
 EXEC = exec
 
 ${EXEC}: ${OBJFILES}
