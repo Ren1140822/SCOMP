@@ -20,3 +20,6 @@ geany_run_script.sh
 
 #Ignore object files
 *.o
+
+#Ignore .DS_Store files (mac)
+*.DS_Store
