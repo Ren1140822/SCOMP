@@ -2,7 +2,7 @@
  * Renato Oliveira > 1140822@isep.ipp.pt
  * SCOMP - Turma 2DD
  * 
- * operation.c
+ * operation.h
  * 
  */
 #include <stdio.h>
@@ -12,7 +12,4 @@
  * 
  * 
  */
-int somar_pares(int *vec,unsigned int size)
-{
-	
-}
+void invert_vec(int *vec1,unsigned int n_elements,float *vec_inv);
