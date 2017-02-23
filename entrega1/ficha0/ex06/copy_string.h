@@ -5,8 +5,6 @@
  * copy_string.h
  * 
  */
-#include <stdio.h>
-#include <stdlib.h>
 
 /*
  * Usando aritmética de apontadores, implemente uma função que recebendo 

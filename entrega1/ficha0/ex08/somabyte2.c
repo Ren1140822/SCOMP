@@ -2,7 +2,7 @@
  * Daniel Goncalves > 1151452@isep.ipp.pt
  * SCOMP - Turma 2DD
  * 
- * somabyte2.h
+ * somabyte2.c
  * 
  */
 #include <stdio.h>
