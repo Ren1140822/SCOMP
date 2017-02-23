@@ -11,5 +11,7 @@
  * como parâmetros o endereço de um vector de inteiros, o seu número de 
  * elementos e um determinado valor, subtraia esse valor a todos os 
  * elementos do vector.
+ * 
+ * RECURSIVE
  */
 void operation( int* vec, unsigned int size, int x);

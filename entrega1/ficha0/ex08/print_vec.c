@@ -19,7 +19,7 @@ void print_vec(int *vec, unsigned int n)
 	int i;
 	for (i = 0; i < n; i++)
 	{
-		printf("%d%s", vec[i], i != n-1 ? "; ": "");
+		printf("%d : %.8x%s", vec[i], vec[i], i != n-1 ? "; ": "");
 	}
 	
 	
