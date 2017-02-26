@@ -7,7 +7,6 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
-#include "bigger_than.h"
 
 /*
  * Crie dinamicamente um vector para armazenar n inteiros (o valor de n 
