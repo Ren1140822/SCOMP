@@ -13,7 +13,7 @@
 
 
 /*
- * Module 0 - Exercise 2
+ * Module 0 - Exercise 7
  */
 
 int main(void) {
