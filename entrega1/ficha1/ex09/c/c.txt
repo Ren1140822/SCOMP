@@ -1,0 +1,4 @@
+9)
+c) Aparece em baixo do makerun o processo pai, e os 5 filhos (6 processos no total).
+Não existe nada para os diferenciar, não se sabe qual foi o processo que executou em 1º lugar.
+Como referido na alínea b), a ordem de execução dos processos poderá ser diferente em cada execução.
