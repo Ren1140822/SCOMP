@@ -9,74 +9,71 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+
+#define NUM_CHILDS 2
 
 /*
- * Module 1 - Exercise 2
- */	
-int main(void) {
-	
-	pid_t pid_a, pid_b;
-	int status_a, status_b;
-	
-	// Creates first process
-	pid_a = fork();
-	
-	// Check for an error
-	if (pid_a < 0)
+ * PL 1 - Exercise 2
+ */
+int main(void)
+{
+
+	pid_t pids[NUM_CHILDS];
+	int status[NUM_CHILDS];
+	int i;
+
+	// Creates n processes
+	for (i = 0; i < NUM_CHILDS; i++)
 	{
-		perror("Error while creating process a.");
-		exit(-1);
-	}
-	
-	if (pid_a > 0) // Only parent executes
-	{
-		printf("\nPID: %d - I'm the parent.\n", getpid());
-		
-		// Creates second process
-		pid_b = fork();
-		
+		printf("pid:%d\n", i);
+		pids[i] = fork();
 		// Check for an error
-		if (pid_b < 0)
+		if (pids[i] < 0)
 		{
-			perror("Error while creating process b.");
+			perror("Error while creating child.");
 			exit(-1);
 		}
-		
-		if (pid_b > 0) // Only parent executes
+		// Only the first parent creates n childs.
+		if (pids[i] == 0)
 		{
-			// Waits for first child
-			waitpid(pid_a, &status_a, 0);
-			// Checks if exited with success
-			if (WIFEXITED(status_a))
-			{
-				printf("The first child exited with success. Exit value: %d\n", WEXITSTATUS(status_a));
-			} else
-			{
-				printf("The first child failed to exit.\n");
-			}
-			
-			// Waits for second child
-			waitpid(pid_b, &status_b, 0);
-			// Checks if exited with success
-			if (WIFEXITED(status_b))
-			{
-				printf("The second child exited with success. Exit value: %d\n", WEXITSTATUS(status_b));
-			} else
-			{
-				printf("The second child failed to exit.\n");
-			}
-			
-		} else // Only second child executes
-		{
-			printf("\nPID: %d - I'm the second child.\n", getpid());
-			exit(2);
+			break;
 		}
-	} else // Only first child executes
+	}
+
+	// Only first child executes
+	if (pids[0] == 0)
 	{
 		printf("\nPID: %d - I'm the first child.\n", getpid());
 		sleep(5);
 		exit(1);
 	}
-	
+	// Only second child executes
+	else if (pids[1] == 0)
+	{
+		printf("\nPID: %d - I'm the second child.\n", getpid());
+		exit(2);
+	}
+	// Only parent executes
+	else
+	{
+		printf("\nPID: %d - I'm the parent.\n", getpid());
+
+		for (i = 0; i < NUM_CHILDS; i++)
+		{
+			// Waits for his child by order
+			waitpid(pids[i], &status[i], 0);
+			// Checks if exited with success
+			if (WIFEXITED(status[i]))
+			{
+				printf("The child number %d exited with success. Exit value: %d\n",
+						(i + 1), WEXITSTATUS(status[i]));
+			} else
+			{
+				printf("This child failed to exit.\n");
+			}
+		}
+	}
+
 	return 0;
 }
