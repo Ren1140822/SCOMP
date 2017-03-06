@@ -35,6 +35,14 @@ int main(void)
 			{
 				// Waits for child
 				waitpid(pid, &status, WNOHANG);
+				// Checks if exited with success
+				if (WIFEXITED(status))
+				{
+					printf("O segund filho com pid #%d terminou com exito.\n", pid);
+				} else
+				{
+					perror("O filho não terminou com exito.\n");
+				}
 			}
 		}
 		else

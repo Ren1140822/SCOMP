@@ -36,7 +36,7 @@ int main(void)
 			// Checks if exited with success
 			if (WIFEXITED(status))
 			{
-				printf("O filho na ordem #%d e pid #%d terminou com exito.\n", WEXITSTATUS(status), getpid());
+				printf("O filho na ordem #%d e pid #%d terminou com exito.\n", WEXITSTATUS(status), pid);
 			} else
 			{
 				perror("O filho não terminou com exito.\n");
