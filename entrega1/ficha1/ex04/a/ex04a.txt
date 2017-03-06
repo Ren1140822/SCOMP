@@ -1,0 +1,17 @@
+4. 
+a)
+
+proc0	+
+	|proc1	+
+	|	|proc3	+
+	|	|	|proc7
+	|	|
+	|	|proc5
+	|
+	|proc2	+
+	|	|proc6
+	|
+	|
+	|proc4
+
+R : 7 processes are created (8 process in total).
