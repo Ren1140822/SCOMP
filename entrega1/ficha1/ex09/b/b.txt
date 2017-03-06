@@ -1,0 +1,3 @@
+9)
+b) Aparece ordenado de vez em quando, não existe qualquer garantia de qual processo
+vai executar primeiro, e isso muda de execução para execução.

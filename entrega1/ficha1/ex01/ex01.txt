@@ -1,0 +1,43 @@
+1. 
+a)
+
+proc1	+
+	|proc2	+
+	|	|proc4
+	|proc3
+
+
+b)
+
+são apresentados no ecrã 4 vezes "Sistemas de computadores", isto porque, apos cada fork o processo
+invocador cria um novo processo e  ambos executam o mesmo programa na linha seguinte, ou seja,
+cada um dos processos invoca a funcao printf("Sistemas de computadores");
+
+c)
+
+#include <stdio.h> 
+#include <sys/types.h> 
+#include <unistd.h>
+
+int main(void)
+{
+	pid_t proc1, proc2
+	proc1 = fork ();
+	
+	if(proc1 < 0){
+		perror(“Fork falhou”); 
+		exit(-1);
+	}
+	proc2 = fork ();
+	
+	if(proc2 < 0){
+                perror(“Fork falhou”);
+                exit(-1);
+        }	
+
+	printf("Sistemas de Computadores\n"); 
+	return 0;
+}
+
+
+	
