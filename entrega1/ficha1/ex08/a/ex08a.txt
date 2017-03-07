@@ -1,0 +1,10 @@
+1. 
+a)
+
+A variável [a], pois é inicializado a 0 antes do fork, logo, o filho copia o mesmo valor do processo pai e em ambos os processos incrementam 5 a variável ficando, em ambos, com o valor 5.
+
+A variável [b] é o pid do filho no processo pai e 0 no processo filho.
+
+A variável [c] é o pid do respetivo processo que invoca a função.
+
+A variável [d] é o pid do processo pai de cada processo, ou seja, do processo pai é o pid da bash e no caso do processo filho é o pid do pai, se terminar primeiro, ou do processo init se ele ficar órfão (pid do init = 1).
