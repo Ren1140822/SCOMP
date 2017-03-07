@@ -13,7 +13,7 @@
 #include <time.h>
 #include "print_vec.h"
 
-#define SIZE 100000
+#define SIZE 1005000
 #define MAX_INTEGER 99
 
 /*
