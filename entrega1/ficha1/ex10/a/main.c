@@ -27,24 +27,19 @@ int main(void)
 	{
 		vec[i] = i;
 	}
-	
 	// Print the vector
 	printf("VEC:");
 	print_vec(vec, SIZE);
-	
 	// the number to search
-	int number = 5;
-	
-	// Create childs and returns the sequence # of creation
+	int number = 20000;
+	// creates childs and returns the sequence # of creation
 	int sequence = create_childs(NUM_CHILDS);
-	
 	// treat error
 	if (sequence == -1)
 	{
 		perror("fork failed\n");
 		exit(-1);
 	}
-	
 	// Parent process
 	if (sequence == 0)
 	{
@@ -60,32 +55,32 @@ int main(void)
 			if (status[i] != 0)
 			{
 				printf("The child #%d found the number(%d)\n", WEXITSTATUS(status[i]), number);
-				exit(0); // ************* Verify if any problem ****************
 			}
 		}
 	}
-	
-	// search magnitude
-	int magnitude = SIZE / 5;
-	
-	// Each child should iterate one interval
-	for (i = 1; i <= NUM_CHILDS; i++)
+	else
 	{
-		if (sequence == i)
+		// search magnitude
+		int magnitude = SIZE / 5;
+		// Each child should iterate one interval
+		for (i = 1; i <= NUM_CHILDS; i++)
 		{
-			int j = magnitude * (sequence - 1);
-			while (j < magnitude * sequence)
+			if (sequence == i)
 			{
-				if (vec[j] == number)
+				int j = magnitude * (sequence - 1);
+				while (j < magnitude * sequence)
 				{
-					// If this child finds the number, returns its order sequence
-					printf("The index #%d of the vector stores the desired number (%d)\n", j, number);
-					exit(sequence);
+					if (vec[j] == number)
+					{
+						// If this child finds the number, returns its order sequence
+						printf("The index #%d of the vector stores the desired number (%d)\n", j, number);
+						exit(sequence);
+					}
+					j++;
 				}
-				j++;
+				// If it doesn't find the number returns 0
+				exit(0);
 			}
-			// If it doesn't find the number returns 0
-			exit(0);
 		}
 	}
 	return 0;
