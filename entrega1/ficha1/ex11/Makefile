@@ -6,9 +6,9 @@
 #
 
 # variables
-INCLUDES = write_vector.h create_childs.h
-SOURCES = write_vector.c create_childs.c main.c
-OBJFILES = write_vector.o create_childs.o main.o 
+INCLUDES = cria_gemeos.h
+SOURCES =  cria_gemeos.c main.c
+OBJFILES = cria_gemeos.o main.o 
 EXEC = exec
 
 ${EXEC}: ${OBJFILES}

@@ -11,79 +11,39 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include "write_vector.h"
+#include "create_childs.h"
 
 /*
  * Module 1 - Exercise 9
  */
+ #define VEC_SIZE 1200000
+ #define VEC_STEP 200000
+ #define NUMBER_OF_CHILDS 6
 
 int main(void) {
 	
-	int i;
-	int  vec[1200000];
-	for(i = 0;i<1200000;i++)
+	int i,child_number;
+	int  vec[VEC_SIZE];
+	for(i = 0;i<VEC_SIZE;i++)
 	{
 		*(vec+i)=i+1;
 	}
-	pid_t pid_a,pid_b,pid_c,pid_d,pid_e;
-	write_vector(vec,0);
-	pid_a= fork();
 	
-	if(pid_a>0)
-	{	
-		pid_b=fork();
-		if(pid_b>0)
-		{
-			pid_c=fork();
-			if(pid_c>0)
-			{
-				pid_d=fork();
-				
-				if(pid_d>0)
-				{
-					pid_e=fork();
-				}
-			}
-		}
-	}
-	if(pid_a==0)
+	child_number = create_childs(NUMBER_OF_CHILDS);
+		
+	if(child_number<0)
 	{
-		write_vector(vec,200000);
+		perror("Error creating fork.\n");
+	}
+	if(child_number>0)
+	{
+		write_vector(vec,child_number*VEC_STEP);
 		exit(0);
 	}
-	if(pid_b==0)
+	for(i=0;i<NUMBER_OF_CHILDS;i++)
 	{
-		
-		write_vector(vec,400000);
-		
-		exit(0);
-	}
-	if(pid_c==0)
-	{
-		
-		write_vector(vec,600000);
-		
-		exit(0);
-	}
-	if(pid_d==0)
-	{
-		
-		write_vector(vec,800000);
-		
-		exit(0);
-	}
-	if(pid_e==0)
-	{
-		
-		write_vector(vec,1000000);
-		exit(0);
-		
-	}
+		wait(NULL);
+	}	
 	
-	if(pid_a>0)//redundante, qualquer outro processo já tinha saido.
-	{
-		 wait(NULL);
-		 exit(0);
-		 
-	}
 	return 0;
 }

@@ -1,0 +1,2 @@
+15)
+c) Devido à não existência de argumentos, consideramos que a primeira função é a mais adequada.
