@@ -21,6 +21,7 @@
  */
 int main(void)
 {
+	// Create vector
 	int vec[SIZE];
 	int i;
 	for (i = 0; i < SIZE; i++)
@@ -30,6 +31,7 @@ int main(void)
 	// Print the vector
 	printf("VEC:");
 	print_vec(vec, SIZE);
+	
 	// the number to search
 	int number = 20000;
 	// creates childs and returns the sequence # of creation
@@ -37,51 +39,38 @@ int main(void)
 	// treat error
 	if (sequence == -1)
 	{
-		perror("fork failed\n");
+		perror("fork failed.\n");
 		exit(-1);
 	}
-	// Parent process
-	if (sequence == 0)
-	{
-		int status[NUM_CHILDS];
-		// Wait for each child (no order)
-		for (i = 0; i < NUM_CHILDS; i++)
-		{
-			wait(&status[i]);
-		}
-		// Print only the sequence number of the process that found the number.
-		for (i = 0; i < NUM_CHILDS; i++)
-		{
-			if (status[i] != 0)
-			{
-				printf("The child #%d found the number(%d)\n", WEXITSTATUS(status[i]), number);
-			}
-		}
-	}
-	else
+	// Child processes
+	if (sequence > 0)
 	{
 		// search magnitude
 		int magnitude = SIZE / 5;
 		// Each child should iterate one interval
-		for (i = 1; i <= NUM_CHILDS; i++)
+		for(i = magnitude * (sequence - 1); i < magnitude * sequence; i++)
 		{
-			if (sequence == i)
+			if (vec[i] == number)
 			{
-				int j = magnitude * (sequence - 1);
-				while (j < magnitude * sequence)
-				{
-					if (vec[j] == number)
-					{
-						// If this child finds the number, returns its order sequence
-						printf("The index #%d of the vector stores the desired number (%d)\n", j, number);
-						exit(sequence);
-					}
-					j++;
-				}
-				// If it doesn't find the number returns 0
-				exit(0);
+				// If this child finds the number, returns its order sequence
+				printf("The index #%d of the vector stores the desired number (%d).\n", i, number);
+				exit(sequence);
 			}
 		}
+		// If it doesn't find the number returns 0
+		exit(0);
 	}
+	// Parent process
+	int status;
+	// Wait for each child (no order)
+	for(i = 0; i < NUM_CHILDS; i++)
+	{
+		wait(&status);
+		if (WIFEXITED(status) && (WEXITSTATUS(status) > 0))
+		{
+			printf("The child #%d found the number.\n", WEXITSTATUS(status));
+		}
+	}
+
 	return 0;
 }
