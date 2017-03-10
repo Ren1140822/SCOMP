@@ -2,18 +2,18 @@
  * Renato Oliveira > 1140822@isep.ipp.pt
  * SCOMP - Turma 2DD
  * 
- * printchar.c
+ * main.c
  * 
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include "system_clone.h"
 
 /*
- * writes a string on the screen
- * 
+ * Module 1 - Exercise 17
  */
-void M(char * c)
-{
-	
-	printf("%s\n",c);
+
+int main(void) {
+	system_clone("ls");
+	return 0;
 }

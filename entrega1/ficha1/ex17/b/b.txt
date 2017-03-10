@@ -1,0 +1,7 @@
+17)
+b)
+Depende do conceito de eficiência. Se for poupança de recursos, o exec é melhor
+porque não criar nenhum child process a não ser que especifiquemos.
+A função system faz isto automaticamente e ainda devolve informação sobre a execução. 
+Ao contrário do exec, a sua imagem não é modificada. O exec é uma chamada direta à kernel,
+enquanto que o system é à shell.
