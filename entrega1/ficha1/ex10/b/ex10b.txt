@@ -1,0 +1,7 @@
+ex 10
+
+b)
+
+A solução não é a mais eficiente em termos de recursos, pois cada processo copia os mesmos do pai e executam em copias separadas (neste caso usam 5 vezes mais recursos do que se fosse apenas um processo).
+
+Quando um processo encontra o numero seleccionado termina, mas os outros processo continuam a procurar o numero ate atingirem o fim do vetor. O processo pai espera que todos acabem e só depois termina.
