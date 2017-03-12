@@ -1,0 +1,9 @@
+ex 14
+a) O programa “exame” é executado 8 vezes e o “alunos” 0 vezes.
+
+
+b) 
+
+Como temos 3 forks() seguidos podemos dizer que ficamos com 2^3 = 8 processos, todos esses processos vão executar o [execlp("exame","exame",NULL);], e depois substituem o seu código pelo código de “exame”. Ficando assim, inacessível o segundo exec().
+
+Podemos verificar esse comportamento na árvore EM ANEXO.

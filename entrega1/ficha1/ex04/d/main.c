@@ -1,9 +1,9 @@
 /*
  * Daniel Goncalves > 1151452@isep.ipp.pt
  * SCOMP - Turma 2DD
- * 
+ *
  * main.c
- * 
+ *
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +18,7 @@ int main(void)
 {
 	pid_t pid;
 	int f;
-	
+
 	for (f = 0; f < 3; f++)
 	{
 		pid = fork();
@@ -28,6 +28,7 @@ int main(void)
 		}
 		else
 		{
+			sleep(1);
 			// Sempre que um filho seja criado é forcado a sair do ciclo.
 			break;
 		}

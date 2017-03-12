@@ -1,9 +1,9 @@
 /*
  * Daniel Goncalves > 1151452@isep.ipp.pt
  * SCOMP - Turma 2DD
- * 
+ *
  * main.c
- * 
+ *
  */
 #include <stdio.h>
 #include <stdlib.h>
@@ -18,7 +18,7 @@ int main(void)
 {
 	pid_t pid;
 	int f;
-	
+
 	for (f = 0; f < 3; f++)
 	{
 		pid = fork();
@@ -27,21 +27,22 @@ int main(void)
 			perror("Erro ao criar filho.");
 			exit(-1);
 		}
-		
+
 		if (pid > 0)
 		{
 			printf("Eu sou o PAI\n");
 		}
 		else
 		{
+			sleep(1);
 			// Sempre que um filho seja criado é forcado a sair do ciclo.
 			break;
 		}
 	}
-	
+
 	if (pid > 0)
 	{
-		// Espera que cada filho termine (a função wait devolve o pid do filho).
+		// Espera que cada filho termine sem ordem (a função wait devolve o pid do filho).
 		while(wait(NULL) > 0);
 	}
 	else
