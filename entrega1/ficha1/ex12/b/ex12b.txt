@@ -1,0 +1,4 @@
+ex 12
+a) O programa SISTCOMP é executado uma vez.
+
+b) O código é executado apenas uma vez porque quando o processo executa o comando excele, o código é substituído pelo o código de SISTCOMP.
