@@ -1,0 +1,6 @@
+ex. 6
+b)
+
+	Verificando a evolução do processo podemos verificar que os dois processos iteram e calculam os elementos do vetor resultados em paralelo. 
+	Mas ambos trabalham em copias diferentes logo, em vetores com endereços de memória diferentes.
+	Para poderemos imprimir em sequência, obrigatoriamente o processo filho terá de calcular a primeira metade do vetor e o pai o segundo. Isto porque, não conseguimos saber quem executa o seu código primeiro, logo podemos utilizar um wait no pai para caso chegue ao wait primeiro que o filho espera que o mesmo termine, para imprimir a sua parte. 
