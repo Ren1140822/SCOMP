@@ -1,0 +1,2 @@
+13)
+a) O programa SISTCOMP é executado 6 vezes.
