@@ -1,0 +1,3 @@
+5)
+b) Sim é possivel. Nada garante que os processos correm ao mesmo tempo, um pode chegar primeiro ao print
+do 3, enquanto que outro por outra eventual razão se atrasou e só depois imprime 1.

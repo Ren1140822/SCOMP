@@ -1,0 +1,6 @@
+13)
+b) Em cada iteração são criados dois processos novos. O primeiro ao ser criado, 
+faz do que o invocou, pai. O segundo ao ser criado, faz do filho do que invocou o primeiro, igualmente pai.
+Na iteração 1 isto deixa-nos com dois pais e um filho. Apenas os pais executam o programa, por isso 
+é executado 2 vezes na primeira iteração. Apos o exec, os pais terminam, deixando so um filho para repetir
+o ciclo que é executado da mesma forma dando 6 execuções do programa no total (2*3 iteraçoes).
