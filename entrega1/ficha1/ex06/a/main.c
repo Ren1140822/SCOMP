@@ -45,19 +45,8 @@ int main(void)
 		exit(-1);
 	}
 	
-	if (pid > 0)
-	{
-		for (i = SIZE / 2; i < SIZE; i++)
-		{
-			resultado[i] = vec[i]*4 + 20;
-		}
-
-		// wait for child and then print vec
-		wait(NULL);
-		// Print second half
-		print_vec((resultado + SIZE/2), SIZE/2);
-	}
-	else
+	// Child process
+	if (pid == 0)
 	{
 		for (i = 0; i < SIZE / 2; i++)
 		{
@@ -68,6 +57,16 @@ int main(void)
 		print_vec(resultado, SIZE/2);
 		exit(1);
 	}
+	
+	// parent process
+	for (i = SIZE / 2; i < SIZE; i++)
+	{
+		resultado[i] = vec[i]*4 + 20;
+	}
+	// wait for child and then print vec
+	wait(NULL);
+	// Print second half
+	print_vec((resultado + SIZE/2), SIZE/2);
 
 	return 0;
 }

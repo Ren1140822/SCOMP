@@ -31,21 +31,25 @@ int main(void)
 		if (pid > 0)
 		{
 			printf("Eu sou o PAI\n");
-			// Waits for child
-			wait(&status);
-			// Checks if exited with success
-			if (WIFEXITED(status))
-			{
-				printf("O filho na ordem #%d e pid #%d terminou com exito.\n", WEXITSTATUS(status), pid);
-			} else
-			{
-				perror("O filho não terminou com exito.\n");
-			}
 		}
 		else
 		{
+			sleep(1);
 			// Numero de ordem (f + 1).
 			exit(f+1);
+		}
+	}
+	
+	// Waits for child
+	while (wait(&status) > 0)
+	{
+		// Checks if exited with success
+		if (WIFEXITED(status))
+		{
+			printf("O filho na ordem #%d e pid #%d terminou com exito.\n", WEXITSTATUS(status), pid);
+		} else
+		{
+			perror("O filho não terminou com exito.\n");
 		}
 	}
 
