@@ -1,0 +1,8 @@
+ex 18
+
+
+Ao utilizaremos uma função exec para executar um script o exec encontra o shebang (#!) e executa esse comando. Ou seja, vai imprimir no ecrã o próprio ficheiro:
+
+(output)   #!/bin/cat -n   Sistemas de Computadores
+(output)
+
