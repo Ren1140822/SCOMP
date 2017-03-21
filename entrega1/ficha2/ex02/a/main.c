@@ -14,7 +14,7 @@
 #include "write_from_stdin.h"
 #include "read_to_stdout.h"
 
-const int BUFFER_SIZE = 81;
+const int BUFFER_SIZE = 3;
 const int READ = 0;
 const int WRITE = 1;
 
@@ -54,7 +54,11 @@ int main(void)
 		// Escrever inteiro
 		write(fd[WRITE], &num, sizeof(num));
 		// Ler & escrever nome
-		write_from_stdin(fd[WRITE], buffer, BUFFER_SIZE);
+		if (write_from_stdin(fd[WRITE], buffer, BUFFER_SIZE) < 0)
+		{
+			perror("write failed.");
+			return -1;
+		}
 		// Fecha descritor de escrita
 		close(fd[WRITE]);
 		// Esperar que o filho acabe (BOA PRÁTICA)

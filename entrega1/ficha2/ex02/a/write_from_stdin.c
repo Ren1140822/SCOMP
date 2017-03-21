@@ -11,10 +11,11 @@
 #include <string.h>
 #include "remove_newline.h"
 
+
 /*
  * Writes all input to pipe until newline ('\n').
  * 
- * returns strings total length.
+ * returns string's total length.
  */
 int write_from_stdin(int fd, char *buffer, int buffer_size)
 {
@@ -32,7 +33,7 @@ int write_from_stdin(int fd, char *buffer, int buffer_size)
 		// Size of string
 		current_length = strlen(buffer);
 		tot_length += current_length;
-		// write to pipe (FIRST: send size -> SECOND: buffer)
+		// write to pipe (FIRST: send size -> SECOND: buffer)	
 		write(fd, &current_length, sizeof(current_length));
 		write(fd, buffer, current_length);
 		
