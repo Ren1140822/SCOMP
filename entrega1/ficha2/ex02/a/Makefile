@@ -6,9 +6,9 @@
 #
 
 # variables
-INCLUDES = clear_new_line.h
-SOURCES = main.c clear_new_line.c
-OBJFILES = main.o clear_new_line.o
+INCLUDES = write_from_stdin.h remove_newline.h read_to_stdout.h
+SOURCES = main.c write_from_stdin.c remove_newline.c read_to_stdout.c
+OBJFILES = main.o write_from_stdin.o remove_newline.o read_to_stdout.o
 EXEC = exec
 
 ${EXEC}: ${OBJFILES}

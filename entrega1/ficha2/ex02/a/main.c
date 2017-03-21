@@ -10,8 +10,9 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include "clear_new_line.h"
 #include <string.h>
+#include "write_from_stdin.h"
+#include "read_to_stdout.h"
 
 const int BUFFER_SIZE = 81;
 const int READ = 0;
@@ -22,11 +23,12 @@ const int WRITE = 1;
  */
 int main(void)
 {
+	// vars
 	pid_t pid;
 	int fd[2];
 	int num;
 	char buffer[BUFFER_SIZE];
-	
+
 	// Criar pipe
 	if(pipe(fd) == -1)	// ERRO AO CRIAR PIPE
 	{
@@ -45,19 +47,15 @@ int main(void)
 	{
 		// Fechar descritor de leitura
 		close(fd[READ]);
+		
+		printf("PROCESSO-PAI> Introduza um inteiro e depois uma string.\n");
 		// Ler inteiro
-		printf("PAI: Introduza um inteiro.\n");
 		scanf("%d%*c", &num);
 		// Escrever inteiro
 		write(fd[WRITE], &num, sizeof(num));
-		// Ler nome
-		printf("PAI: Introduza o seu nome.\n");
-		fgets(buffer, BUFFER_SIZE, stdin);
-		// Retirar '\n'
-		clear_new_line(buffer);
-		// Escrever nome
-		write(fd[WRITE], buffer, strlen(buffer));
-		// Fechar descritor de escrita
+		// Ler & escrever nome
+		write_from_stdin(fd[WRITE], buffer, BUFFER_SIZE);
+		// Fecha descritor de escrita
 		close(fd[WRITE]);
 		// Esperar que o filho acabe (BOA PRÁTICA)
 		wait(NULL);
@@ -65,11 +63,12 @@ int main(void)
 	{
 		// Fechar descritor de escrita
 		close(fd[WRITE]);
-		// Ler inteiro & nome
-		while (read(fd[READ], &num, sizeof(num)) && read(fd[READ], &buffer, BUFFER_SIZE))
-		{
-			printf("int: %d\nnome: %s\n", num, buffer);
-		}
+		// Ler inteiro
+		read(fd[READ], &num, sizeof(num));
+		printf("PROCESSO-FILHO> int: %d\n", num);
+		// Ler nome
+		printf("PROCESSO-FILHO> nome: ");
+		read_to_stdout(fd[READ], buffer, BUFFER_SIZE);
 		// Fechar descritor de leitura
 		close(fd[READ]);
 	}
