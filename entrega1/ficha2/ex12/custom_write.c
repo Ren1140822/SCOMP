@@ -13,7 +13,7 @@
 /*
  * Write to pipe content of a file.
  * 
- * returns the file length.
+ * returns 0 if a error was encountered, 1 otherwise.
  */
 int write_to_pipe(int fd, const char *filename, const unsigned int buffer_size)
 {
