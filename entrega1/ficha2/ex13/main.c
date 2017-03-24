@@ -14,7 +14,7 @@
 
 
 
-const int BUFFER_SIZE= 81;
+const int BUFFER_SIZE= 180;
 const int READ =0;
 const int WRITE =1;
 
@@ -60,10 +60,11 @@ int main(void)
 	} else 				// PROCESSO FILHO
 	{
 		close(fd[READ]);
-		dup2(STDOUT_FILENO,fd[WRITE]);
+		dup2(fd[WRITE],STDOUT_FILENO);
+		close(fd[WRITE]);
 		execl("/bin/sort","sort","fx.txt",(char*)NULL);
 		
-		close(fd[WRITE]);
+
 	}
 	
 	return 0;
