@@ -17,8 +17,6 @@
 // Descriptor constants
 const int READ = 0;
 const int WRITE = 1;
-const int STDIN = 0;
-const int STDOUT = 1;
 
 // Settings constants
 const int NUM_CHILDS = 1;
@@ -63,7 +61,7 @@ int main(void)
 		// Close pie's write descriptor
 		close(fd[WRITE]);
 		// Redirect stdin to pipe
-		dup2(fd[READ], STDIN);
+		dup2(fd[READ], STDIN_FILENO);
 		// Close pipe's read descriptor
 		close(fd[READ]);
 		// Execute command
