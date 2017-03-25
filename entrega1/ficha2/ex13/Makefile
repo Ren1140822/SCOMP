@@ -6,9 +6,9 @@
 #
 
 # variables
-INCLUDES = create_childs.h concat_string_with_int.h
-SOURCES = main.c create_childs.c concat_string_with_int.c
-OBJFILES = main.o create_childs.o concat_string_with_int.o
+INCLUDES = 
+SOURCES = main.c 
+OBJFILES = main.o
 EXEC = exec
 
 ${EXEC}: ${OBJFILES}
