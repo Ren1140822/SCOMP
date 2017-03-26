@@ -54,7 +54,11 @@ int main(int argc,char *argv[])
 		// Close read descriptor
 		close(fd[READ]);
 		//Redirect stdout to pipe's write descriptor
-		dup2(fd[WRITE], STDOUT_FILENO);
+		if(dup2(fd[WRITE], STDOUT_FILENO) < 0)
+		{
+			perror("dup failed.");
+			exit(EXIT_FAILURE);
+		}
 		// Close wite descriptor
 		close(fd[WRITE]);
 		// First Command received
@@ -72,7 +76,11 @@ int main(int argc,char *argv[])
 		// Close read descriptor
 		close(fd[WRITE]);
 		//Redirect stdout to pipe's write descriptor
-		dup2(fd[READ], STDIN_FILENO);
+		if(dup2(fd[READ], STDIN_FILENO) < 0)
+		{
+			perror("dup failed.");
+			exit(EXIT_FAILURE);
+		}
 		// Close wite descriptor
 		close(fd[READ]);
 		// Open file and get descriptor
