@@ -6,9 +6,9 @@
 #
 
 # variables
-INCLUDES = create_childs.h 	redirect_file_descriptor.h
-SOURCES = main.c create_childs.c 	redirect_file_descriptor.c
-OBJFILES = main.o create_childs.o 	redirect_file_descriptor.o
+INCLUDES = fatorial.h
+SOURCES = main.c fatorial.c
+OBJFILES = main.o fatorial.o
 EXEC = exec
 
 ${EXEC}: ${OBJFILES}
