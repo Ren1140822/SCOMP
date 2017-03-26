@@ -61,7 +61,11 @@ int main(void)
 		// Close pie's write descriptor
 		close(fd[WRITE]);
 		// Redirect stdin to pipe
-		dup2(fd[READ], STDIN_FILENO);
+		if(dup2(fd[READ], STDIN_FILENO) < 0)
+		{
+			perror("dup failed.");
+			exit(EXIT_FAILURE);
+		}
 		// Close pipe's read descriptor
 		close(fd[READ]);
 		// Execute command
