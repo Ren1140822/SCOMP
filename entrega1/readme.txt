@@ -19,3 +19,5 @@ c) Estrutura de diretórios na raiz do repositório:
 	- O nome desse subdiretório deve ser iniciado pelas letras MINÚSCULAS "ex" e ser seguido do número (SEMPRE com 2 dígitos) que identifica o exercício. Ex: "ex01"
 
 Submission closed for class entrega1
+
+Submission closed for class entrega1
