@@ -17,4 +17,4 @@ int shm_open_rd_mode(const char *name, unsigned int timeout);
 /*
  * Waits until flag is set to 1.
  */
-int wait_to_write(int *w_flag, int timeout);
+int wait_for_write(int *w_flag, int timeout);

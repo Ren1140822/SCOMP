@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 	
 	// Wait until writer finishes writing
 	printf("[ok]\n\nWaiting for writer to finish writing . . .\n");
-	if (wait_to_write(&sh_data->w_flag, WRITE_TIMEOUT) < 0)
+	if (wait_for_write(&sh_data->w_flag, WRITE_TIMEOUT) < 0)
 	{
 		perror("Waiting for writer timed out.");
 		exit(EXIT_FAILURE);
