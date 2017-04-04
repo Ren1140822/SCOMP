@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
 	
 	// Shared memory vector
 	int *sh_vector;
-	int fd;
+	int fd, data_size = sizeof(int) * SH_VEC_SIZE;
 	// Open shm
 	fd = shm_open(SHM_NAME, O_CREAT|O_EXCL|O_RDWR, S_IRUSR|S_IWUSR);
 	if (fd < 0)
@@ -49,13 +49,13 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	// Truncate shm
-	if (ftruncate(fd, SH_VEC_SIZE) < 0)
+	if (ftruncate(fd, data_size) < 0)
 	{
 		perror("Truncating shared memory failed.");
 		exit(EXIT_FAILURE);
 	}
 	// Map shm
-	sh_vector = (int *) mmap(NULL, SH_VEC_SIZE, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
+	sh_vector = (int *) mmap(NULL, data_size, PROT_READ|PROT_WRITE, MAP_SHARED, fd, 0);
 	if (sh_vector == MAP_FAILED)
 	{
 		perror("Mapping shared memory failed.");
@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 		printf("\nThe maximum value found is: %d\n", maximum);
 		
 		// Unmap & close
-		if (munmap(sh_vector, SH_VEC_SIZE) < 0)
+		if (munmap(sh_vector, data_size) < 0)
 		{
 			exit(EXIT_FAILURE);
 		}
