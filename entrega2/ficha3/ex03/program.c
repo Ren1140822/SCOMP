@@ -23,7 +23,7 @@ const int NUMBER_OF_LOOPS=10000000;
 /*
  * PL 3 - Exercise 00 - WRITER
  */
-int main(void)
+int main()
 {
 	// Vars
 	int fd, data_size = sizeof(shd_type);
@@ -103,5 +103,23 @@ int main(void)
 		}
 		printf("SON found %d  numbers found different from expected value.\n",counter);
 	}
+	
+	// Unmap & close
+	if (munmap(sh_data, data_size) < 0)
+	{
+		exit(EXIT_FAILURE);
+	}
+	if (close(fd) < 0)
+	{
+		exit(EXIT_FAILURE);
+	}
+	// Unlink option
+	
+	if (shm_unlink(SHM_NAME) < 0)
+	{
+		exit(EXIT_FAILURE);
+	}
+	
+	
 	return 0;
 }
