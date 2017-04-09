@@ -21,7 +21,7 @@
 
 
 /*
- * PL 3 - Exercise 05 - WRITER/READER
+ * PL 3 - Exercise 05 
  */
 int main(void)
 {

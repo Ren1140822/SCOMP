@@ -2,7 +2,7 @@
  * Renato Oliveira > 1140822@isep.ipp.pt
  * SCOMP - Turma 2DD
  * 
- * writer.c
+ * program.c
  * 
  */
 #include <stdio.h>
@@ -67,25 +67,24 @@ int main(void)
 	 }
 	
 	 else{
+		 
 		  int numbers_read=0;
 		  while(1)
 		  {
 			
 			 if(sh_data->numbers_to_read>0)
 			 {
-				printf("%d\n",sh_data->vector[sh_data->reader_index]);
+				printf("Read number %d, on position %d.\n",sh_data->vector[sh_data->reader_index],sh_data->reader_index);
 				sh_data->reader_index ++;
 				sh_data->reader_index = sh_data->reader_index%SHD_VEC_SIZE;
 				sh_data->numbers_to_read --;
 				numbers_read++;
 			
 			}
-			
 			if(numbers_read == VEC_WRITE_SIZE)
 			{
 				 exit(0);
 			}
-			
 		  }
 	 }
 	 
