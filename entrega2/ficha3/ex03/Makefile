@@ -5,32 +5,26 @@
 # Makefile
 #
 
-# Variables WRITER
-INCLUDES_W = shd_type.h shm_helper.h
-SOURCES_W = shm_helper.c
-OBJFILES_W = shm_helper.o
-# Variables READER
-INCLUDES_R = shd_type.h shm_helper.h 
-SOURCES_R = shm_helper.c 
-OBJFILES_R = shm_helper.o 
+# Variables
+INCLUDES = 
+SOURCES = program.c
+OBJFILES = program.o
+EXEC = exec
 
-all: clean program
-
-
-program: ${OBJFILES_W}
-	gcc -Wall -g -o program program.c ${OBJFILES_W} -lrt -lm
-
-
-run_program: program
-	./program
-	
-clean:
-	rm -f program ${OBJFILES_W} ${OBJFILES_R}
+${EXEC}: ${OBJFILES}
+	gcc -Wall -g -o ${EXEC} ${OBJFILES} -lrt -lm
 
 # How to transform .c to .o ; $< -- file name
 .c.o:
 	gcc -Wall -g -c $< -lrt -lm
-	
-${OBJFILES_W}: ${SOURCES_W} ${INCLUDES_W}
 
-${OBJFILES_R}: ${SOURCES_R} ${INCLUDES_R}
+${OBJFILES}: ${SOURCES} ${INCLUDES}
+
+run: clean ${EXEC}
+	./${EXEC}
+	
+debug: ${EXEC}
+	gdb -tui ${EXEC}
+
+clean:
+	rm -f ${OBJFILES} ${EXEC}

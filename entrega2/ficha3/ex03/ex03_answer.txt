@@ -1,0 +1,19 @@
+EX03 : Will these results always be consistent?
+
+
+R : No, because there is a race condition between both processes, that is when
+two or more processes can access shared data and they try to change it at the same time.
+In the exercise we try to increment the value, this represents at least three operations (move variable to a register, increment and move back to variable), while both porcesses are doing this concurrently there may be a change they don't 
+do these operations in the coorect sequence.
+
+Here is an example how it could go wrong.
+
+
+PARENT		Value		CHILD
+movl eax	100		
+		100		movl eax
+incl eax	101		
+		101		incl eax
+
+movl var	101
+		101		movl var		
