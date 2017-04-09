@@ -20,7 +20,7 @@ const char *SHM_NAME = "/shm_f3_ex03";
 /*
  * PL 3 - Exercise 03
  */
-int main(void)
+int main()
 {
 	// Start variable at 100
 	int sh_integer = 100;
@@ -90,6 +90,22 @@ int main(void)
 			exit(EXIT_FAILURE);
 		}
 	}
+
+	// Unmap & close
+	if (munmap(sh_data, data_size) < 0)
+	{
+		exit(EXIT_FAILURE);
+	}
+	if (close(fd) < 0)
+	{
+		exit(EXIT_FAILURE);
+	}
+	// Unlink option
 	
+	if (shm_unlink(SHM_NAME) < 0)
+	{
+		exit(EXIT_FAILURE);
+	}
+
 	return 0;
 }
