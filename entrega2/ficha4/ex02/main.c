@@ -21,7 +21,7 @@
 // Setting constants
 const int NUM_CHILDS = 5;
 const char *FILENAME = "ex02.txt";
-const int SIZE = 10;
+const int SIZE = 200;
 
 /*
  * PL 4 - Exercise 02
@@ -30,7 +30,11 @@ int main(int argc, char *argv[])
 {
 	// Create semaphores
 	sem_t *sems[NUM_CHILDS - 1];
-	create_sem_array(sems, (NUM_CHILDS - 1), 0);
+	if (create_sem_array(sems, (NUM_CHILDS - 1), 0) == NULL)
+	{
+		perror("Semaphores failed.\n");
+		exit(EXIT_FAILURE);
+	}
 
 	// Create new process
 	int seq = create_childs(NUM_CHILDS);
@@ -57,7 +61,7 @@ int main(int argc, char *argv[])
 		int i;
 		for (i = (seq - 1) * SIZE; i < seq * SIZE; i++)
 		{
-			fprintf(fptr, "%d\t", i);
+			fprintf(fptr, "%d ", i);
 		}
 		fprintf(fptr, "\n");
 		// Close file
@@ -87,7 +91,11 @@ int main(int argc, char *argv[])
 	fclose(fptr);
 	
 	// Unlink Semaphore
-	unlink_sem_array(sems, (NUM_CHILDS - 1));
+	if (unlink_sem_array(sems, (NUM_CHILDS - 1)) == NULL)
+	{
+		perror("SEM unlink failed.\n");
+		exit(EXIT_FAILURE);
+	}
 	printf("\nSEM Unlinked with success.\n");
 	// Remove file
 	if(!remove(FILENAME)) 

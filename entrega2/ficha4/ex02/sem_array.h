@@ -5,6 +5,6 @@
  * sem_array.h
  * 
  */
-void create_sem_array(sem_t **sems, size_t SIZE, int sem_value);
+sem_t **create_sem_array(sem_t **sems, size_t SIZE, int sem_value);
 
-void unlink_sem_array(sem_t **sems, size_t SIZE);
+sem_t **unlink_sem_array(sem_t **sems, size_t SIZE);

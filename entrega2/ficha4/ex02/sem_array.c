@@ -19,7 +19,7 @@
 const char *SEM_NAME = "sem_no_";
 const size_t BUFF_SIZE = 81;
 
-void create_sem_array(sem_t **sems, size_t SIZE, int sem_value)
+sem_t **create_sem_array(sem_t **sems, size_t SIZE, int sem_value)
 {
 	int i;
 	for (i = 0; i < SIZE; i++)
@@ -31,13 +31,13 @@ void create_sem_array(sem_t **sems, size_t SIZE, int sem_value)
 		sems[i] = sem_open(tmp, O_CREAT | O_EXCL, S_IRUSR|S_IWUSR, sem_value);
 		if (sems[i] == SEM_FAILED)
 		{
-			perror("Semaphores failed.\n");
-			exit(EXIT_FAILURE);
+			return NULL;
 		}
 	}
+	return sems;
 }
 
-void unlink_sem_array(sem_t **sems, size_t SIZE)
+sem_t **unlink_sem_array(sem_t **sems, size_t SIZE)
 {
 	int i;
 	for (i = 0; i < SIZE; i++)
@@ -48,8 +48,8 @@ void unlink_sem_array(sem_t **sems, size_t SIZE)
 		// Unlink Semaphore
 		if (sem_unlink(tmp) < 0)
 		{
-			perror("SEM unlink failed.\n");
-			exit(EXIT_FAILURE);
+			return NULL;
 		}
 	}
+	return sems;
 }
