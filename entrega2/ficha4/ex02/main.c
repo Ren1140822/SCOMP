@@ -29,12 +29,14 @@ const int SIZE = 200;
 int main(int argc, char *argv[])
 {
 	// Create semaphores
-	sem_t *sems[NUM_CHILDS - 1];
-	if (create_sem_array(sems, (NUM_CHILDS - 1), 0) == NULL)
+	sem_t *sems[NUM_CHILDS];
+	if (create_sem_array(sems, (NUM_CHILDS), 0) == NULL)
 	{
 		perror("Semaphores failed.\n");
 		exit(EXIT_FAILURE);
 	}
+	// Set first semaphore's value to 1
+	sem_post(sems[0]);
 
 	// Create new process
 	int seq = create_childs(NUM_CHILDS);
@@ -46,14 +48,11 @@ int main(int argc, char *argv[])
 	// Child processes
 	if (seq > 0)
 	{
-		// Related semaphore
-		unsigned int sem_no = seq - 2;
-		
-		if (seq > 1) // Wait for previous process to complete
-		{
-			// Decrement SEM
-			sem_wait(sems[sem_no]);
-		}
+		// Related SEM & next SEM
+		unsigned int cur_sem_no = seq - 1;
+		unsigned int nxt_sem_no = seq % NUM_CHILDS;
+		// Decrement SEM
+		sem_wait(sems[cur_sem_no]);
 		
 		// Open File with write (& truncate) privileges 
 		FILE *fptr = fopen(FILENAME, "a");
@@ -66,12 +65,9 @@ int main(int argc, char *argv[])
 		fprintf(fptr, "\n");
 		// Close file
 		fclose(fptr);
-		
-		if (seq < NUM_CHILDS) // Unlock next semaphore
-		{
-			// Increment SEM
-			sem_post(sems[sem_no + 1]);
-		}
+
+		// Increment SEM
+		sem_post(sems[nxt_sem_no]);
 		
 		exit(EXIT_SUCCESS);
 	}
@@ -90,13 +86,20 @@ int main(int argc, char *argv[])
 	// Close file
 	fclose(fptr);
 	
-	// Unlink Semaphore
-	if (unlink_sem_array(sems, (NUM_CHILDS - 1)) == NULL)
+	// Close semaphores
+	if (close_sem_array(sems, NUM_CHILDS) < 0)
+	{
+		perror("SEM close failed.\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("\nSEM closed with success.\n");
+	// Unlink semaphores
+	if (unlink_sem_array(sems, NUM_CHILDS) == NULL)
 	{
 		perror("SEM unlink failed.\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("\nSEM Unlinked with success.\n");
+	printf("SEM unlinked with success.\n");
 	// Remove file
 	if(!remove(FILENAME)) 
 	{

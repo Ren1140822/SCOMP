@@ -37,6 +37,20 @@ sem_t **create_sem_array(sem_t **sems, size_t SIZE, int sem_value)
 	return sems;
 }
 
+int close_sem_array(sem_t **sems, size_t SIZE)
+{
+	int i;
+	for (i = 0; i < SIZE; i++)
+	{
+		// Close Semaphore
+		if (sem_close(sems[i]) < 0)
+		{
+			return -1;
+		}
+	}
+	return 0;
+}
+
 sem_t **unlink_sem_array(sem_t **sems, size_t SIZE)
 {
 	int i;
