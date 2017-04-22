@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 		int i;
 		for (i = (seq - 1) * SIZE; i < seq * SIZE; i++)
 		{
-			fprintf(fptr, "%d\t", i);
+			fprintf(fptr, "%d ", i);
 		}
 		fprintf(fptr, "\n");
 		// Close file
@@ -80,13 +80,20 @@ int main(int argc, char *argv[])
 	// Close file
 	fclose(fptr);
 	
+	// Close Semaphore
+	if (sem_close(mutex) < 0)
+	{
+		perror("SEM close failed.\n");
+		exit(EXIT_FAILURE);
+	}
+	printf("\nSEM closed with success.\n");
 	// Unlink Semaphore
 	if (sem_unlink(SEM_NAME) < 0)
 	{
 		perror("SEM unlink failed.\n");
 		exit(EXIT_FAILURE);
 	}
-	printf("\nSEM Unlinked with success.\n");
+	printf("SEM unlinked with success.\n");
 	// Remove file
 	if(!remove(FILENAME)) 
 	{
