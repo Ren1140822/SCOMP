@@ -51,7 +51,7 @@ int close_sem_array(sem_t **sems, size_t SIZE)
 	return 0;
 }
 
-sem_t **unlink_sem_array(sem_t **sems, size_t SIZE)
+int unlink_sem_array(sem_t **sems, size_t SIZE)
 {
 	int i;
 	for (i = 0; i < SIZE; i++)
@@ -62,8 +62,8 @@ sem_t **unlink_sem_array(sem_t **sems, size_t SIZE)
 		// Unlink Semaphore
 		if (sem_unlink(tmp) < 0)
 		{
-			return NULL;
+			return -1;
 		}
 	}
-	return sems;
+	return 0;
 }

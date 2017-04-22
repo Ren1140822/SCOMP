@@ -94,7 +94,7 @@ int main(int argc, char *argv[])
 	}
 	printf("\nSEM closed with success.\n");
 	// Unlink semaphores
-	if (unlink_sem_array(sems, NUM_CHILDS) == NULL)
+	if (unlink_sem_array(sems, NUM_CHILDS) < 0)
 	{
 		perror("SEM unlink failed.\n");
 		exit(EXIT_FAILURE);

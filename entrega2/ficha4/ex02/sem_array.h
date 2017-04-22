@@ -9,4 +9,4 @@ sem_t **create_sem_array(sem_t **sems, size_t SIZE, int sem_value);
 
 int close_sem_array(sem_t **sems, size_t SIZE);
 
-sem_t **unlink_sem_array(sem_t **sems, size_t SIZE);
+int unlink_sem_array(sem_t **sems, size_t SIZE);
