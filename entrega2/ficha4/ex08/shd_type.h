@@ -17,9 +17,11 @@
  */
 typedef struct
 {
+	int op_type;
 	int client_number;
 	int balance;
+	int withdraw_ammount;
+	int close_connection;
 }
 shd_type;
-
 #endif

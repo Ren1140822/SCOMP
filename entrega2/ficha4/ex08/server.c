@@ -21,6 +21,7 @@
 const char *SEM_NAME[NUM_SEMS] = {"sem_request", "sem_process"};
 const int NR_SEM_REQUEST =0;
 const int NR_SEM_PROCESS =1;
+const int ACCS_NUMBER=3;
 
 typedef struct
 {
@@ -40,16 +41,23 @@ int main(int argc, char *argv[])
 	int fd, data_size = sizeof(shd_type);
 	shd_type *sh_data;
 	sem_t *sems[NUM_SEMS];
-	account acc;
-	sems[NR_SEM_REQUEST] = sem_open(SEM_NAME[NR_SEM_REQUEST], O_CREAT | O_EXCL, S_IRUSR|S_IWUSR, 1); 
+	account * accs = malloc(ACCS_NUMBER*sizeof(account));
+	sems[NR_SEM_REQUEST] = sem_open(SEM_NAME[NR_SEM_REQUEST], O_CREAT | O_EXCL, S_IRUSR|S_IWUSR, 0); 
 	sems[NR_SEM_PROCESS] = sem_open(SEM_NAME[NR_SEM_PROCESS], O_CREAT | O_EXCL, S_IRUSR|S_IWUSR, 0); 
 	if (sems[NR_SEM_REQUEST] == SEM_FAILED || sems[NR_SEM_PROCESS] == SEM_FAILED)
 	{
 		perror("Semaphore failed.\n");
 		exit(EXIT_FAILURE);
 	}
-	acc.client_number =1;
-	acc.balance = 2000;
+	//fills account information for 3 clients
+	int j =0;
+	for (j = 0; j < ACCS_NUMBER; j++)
+	{	
+		accs[j].client_number =j+1;
+		accs[j].balance = 2000 *(j+1);
+	}
+	
+	
 	// Open shm
 	fd = shm_open(SHM_NAME, O_CREAT|O_EXCL|O_RDWR, S_IRUSR|S_IWUSR);
 	if (fd < 0)
@@ -72,22 +80,50 @@ int main(int argc, char *argv[])
 	}
 	
 	//main server loop
-	while(1)
-	{
-		int sval;
-		sem_getvalue(sems[NR_SEM_REQUEST],&sval);
-		if(sval<1) //there was a request for account info or withdrawal.
-		{
+	int loop=1;
+	
+	while(loop)
+	{		int found=0;
+			sem_wait(sems[NR_SEM_REQUEST]);
 			int i=0;
-			for (i = 0; i < 2; i++)
+			
+			for (i = 0; i < ACCS_NUMBER; i++)
 			{
-				if(sh_data->client_number == acc.client_number)
+				if(sh_data->client_number == accs[i].client_number)
 				{
-					sh_data->balance = acc.balance;
-					sem_post(sems[NR_SEM_PROCESS]);
+					//if it finds at least one match.
+					found=1;
+					
+					if(sh_data->op_type==1)//if its a withdrawal
+					{
+						if(sh_data->withdraw_ammount==0)//break condition
+						{
+							sem_post(sems[NR_SEM_PROCESS]);
+							
+							loop=0;
+							break;
+						}
+						if(sh_data->withdraw_ammount<=accs[i].balance)//if it is actually possible to withdraw
+						{
+							
+							accs[i].balance-=sh_data->withdraw_ammount;
+						}
+					}
+					sh_data->balance = accs[i].balance;
+					
+					sem_post(sems[NR_SEM_PROCESS]);//tells the client the server has finished processing
 				}
+			
 			}
-		}
+			if(found!=1)//if no client matches found
+			{
+				printf("Client not found in server.\n");
+				
+				sh_data->close_connection=1;
+				
+				sem_post(sems[NR_SEM_PROCESS]);
+			}
+			
 	}
 	
 	// Close Semaphore
