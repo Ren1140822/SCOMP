@@ -162,10 +162,8 @@ int main(int argc, char *argv[])
 	sem_wait(sem_shm); // Wait for exclusive access to shm
 	sleep(time_at_balcony); // Time in the balcony
 	printf("My ticket number: %d (time at balcony: %d | waiting ticket #%d)\n", shm->ticket, time_at_balcony, waiting_ticket); // Print ticket
-	sem_post(sem_shm); // Unlock shm
 	
-	sem_wait(sem_shm); // Wait for exclusive access to shm
-	(shm->next)++; // Next wiating ticket
+	(shm->next)++; // Next waiting ticket
 	sem_post(sem_shm); // Unlock shm
 	
 	sem_post(sem_barrier1); // Free queue for next in line
