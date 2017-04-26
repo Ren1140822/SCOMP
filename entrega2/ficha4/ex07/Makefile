@@ -8,10 +8,10 @@
 all: clean seller client
 
 seller:
-	gcc -Wall -g -o seller seller.c -lrt -lm -lpthread
+	gcc -Wall -g -o seller seller.c sem_array.c -lrt -lm -lpthread
 
 client:
-	gcc -Wall -g -o client client.c -lrt -lm -lpthread
+	gcc -Wall -g -o client client.c sem_array.c -lrt -lm -lpthread
 
 clean:
 	rm -f client seller

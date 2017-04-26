@@ -15,15 +15,25 @@
 #include <fcntl.h>           /* For O_* constants */
 #include <semaphore.h>
 
+#include "sem_array.h"
 #include "shm_type.h"
 
 // Setting constants
-const char *NAME_QUEUE = "sem_queue";
-const char *NAME_REQUEST = "sem_request_ticket";
-const char *NAME_COLLECT = "sem_collect_ticket";
-const char *NAME_SHM = "sem_shm";
-const char *NAME_BARRIER1 = "sem_barrier1";
-const char *NAME_BARRIER2 = "sem_barrier2";
+#define SEMS_SIZE 5
+
+const int S_REQUEST = 0; 	// semaphore to request a ticket (by occurence of events)
+
+const int S_COLLECT = 1; 	// semaphore to collect a ticket (by occurence of events)
+
+const int S_SHM = 2; 		// semaphore to access SHM (mutual exclusion)
+
+const int S_BARRIER1 = 3; 	// semaphore as a barrier so that each client can check if 
+							// he is next in line (mutual exclusion)
+							 
+const int S_BARRIER2 = 4;	// semaphore as a barrier so that only when all processes that 
+							// have a waiting ticket pass the first barrier. This is to avoid the
+							// possibility of one process controlling the barrier and entering a deadlock (by occurence of events)
+
 const int MIN_WAIT = 1;
 const int MAX_WAIT = 10;
 
@@ -32,42 +42,10 @@ const int MAX_WAIT = 10;
  */
 int main(int argc, char *argv[])
 {
-	sem_t *sem_request, *sem_collect, *sem_shm, *sem_barrier1, *sem_barrier2;
-
-	// Open semaphore to request a ticket (by occurence of events)
-	sem_request = sem_open(NAME_REQUEST, O_EXCL, S_IRUSR|S_IWUSR, 0);
-	if (sem_request == SEM_FAILED)
-	{
-		perror("Semaphore failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	// Open semaphore to collect a ticket (by occurence of events)
-	sem_collect = sem_open(NAME_COLLECT, O_EXCL, S_IRUSR|S_IWUSR, 0);
-	if (sem_collect == SEM_FAILED)
-	{
-		perror("Semaphore failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	// Open semaphore to access SHM (mutual exclusion)
-	sem_shm = sem_open(NAME_SHM, O_EXCL, S_IRUSR|S_IWUSR, 1);
-	if (sem_shm == SEM_FAILED)
-	{
-		perror("Semaphore failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	// Create a semaphore as a barrier so that each client can check if 
-	// he is next in line (mutual exclusion) 
-	sem_barrier1 = sem_open(NAME_BARRIER1, O_EXCL, S_IRUSR|S_IWUSR, 1);
-	if (sem_barrier1 == SEM_FAILED)
-	{
-		perror("Semaphore failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	// Create a semaphore as a barrier so that only when all processes that 
-	// have a waiting ticket pass the first barrier. This is to avoid the
-	// possibility of one process controlling the barrier and entering a deadlock (by occurence of events)
-	sem_barrier2 = sem_open(NAME_BARRIER2, O_EXCL, S_IRUSR|S_IWUSR, 0);
-	if (sem_barrier2 == SEM_FAILED)
+	// Open semaphores
+	int sem_values[SEMS_SIZE] = { 0, 0, 1, 1, 0 };
+	sem_t *sems[SEMS_SIZE];
+	if (create_sem_array(sems, SEMS_SIZE, O_EXCL, sem_values) == NULL)
 	{
 		perror("Semaphore failed.\n");
 		exit(EXIT_FAILURE);
@@ -103,95 +81,70 @@ int main(int argc, char *argv[])
 	
 	// Take a waiting ticket
 	int waiting_ticket;
-	sem_wait(sem_shm); // Wait for exclusive access to shm
+	sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
 	waiting_ticket = shm->waiting_ticket;
 	shm->waiting_ticket++; // next waiting ticket
-	sem_post(sem_shm); // Unlock shm
+	sem_post(sems[S_SHM]); // Unlock shm
 	
 	// Waiting mechanism
 	unsigned int be_served = 0, next_ticket;
 	while (!be_served)
 	{
-		printf("I'm at b1\n");
-		sem_wait(sem_barrier1); sem_post(sem_barrier1); // first barrier to block clients in queue
+		sem_wait(sems[S_BARRIER1]); sem_post(sems[S_BARRIER1]); // first barrier to block clients in queue
 		
-		sem_wait(sem_shm); // Wait for exclusive access to shm
+		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
 		next_ticket = shm->next; // Next waiting ticket
-		sem_post(sem_shm); // Unlock shm
+		sem_post(sems[S_SHM]); // Unlock shm
 		
 		if (waiting_ticket == next_ticket) // Check if it's his turn
 		{
 			be_served = 1;
 		}
-		printf("next: %d\n", next_ticket);
 		// Increment queue size
-		sem_wait(sem_shm); // Wait for exclusive access to shm
+		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
 		(shm->queue_size)++;
-		sem_post(sem_shm); // Unlock shm
+		sem_post(sems[S_SHM]); // Unlock shm
 		
 		// Wait for all clients that have waiting tickets
 		// to pass first barrier
 		if (shm->queue_size == ((shm->waiting_ticket - shm->next)))
 		{
-			printf("locking b1.\n");
-			sem_wait(sem_barrier1); // Close first barrier
-			printf("unlocking b1.\n");
-			sem_post(sem_barrier2);
+			sem_wait(sems[S_BARRIER1]); // Close first barrier
+			sem_post(sems[S_BARRIER2]);
 		}
-		printf("I'm at b2\n");
-		sem_wait(sem_barrier2); sem_post(sem_barrier2); // second barrier to wait for all waiting clients before proceeding
+		sem_wait(sems[S_BARRIER2]); sem_post(sems[S_BARRIER2]); // second barrier to wait for all waiting clients before proceeding
 		
 		// Decrement queue size
-		sem_wait(sem_shm); // Wait for exclusive access to shm
+		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
 		(shm->queue_size)--;
-		sem_post(sem_shm); // Unlock shm
+		sem_post(sems[S_SHM]); // Unlock shm
 		
 		// Wait for all clients that were in between barriers
 		// to pass second barrier
 		if (shm->queue_size == 0)
 		{
-			sem_wait(sem_barrier2); // Close second barrier
+			sem_wait(sems[S_BARRIER2]); // Close second barrier
 		}
 	}
-	printf("My turn\n");
 	// Purchase ticket
-	sem_post(sem_request); // Request ticket
+	sem_post(sems[S_REQUEST]); // Request ticket
 	
-	sem_wait(sem_collect); // Collect ticket
+	sem_wait(sems[S_COLLECT]); // Collect ticket
 	
-	sem_wait(sem_shm); // Wait for exclusive access to shm
+	sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
+	
 	sleep(time_at_balcony); // Time in the balcony
 	printf("My ticket number: %d (time at balcony: %d | waiting ticket #%d)\n", shm->ticket, time_at_balcony, waiting_ticket); // Print ticket
-	
 	(shm->next)++; // Next waiting ticket
-	sem_post(sem_shm); // Unlock shm
 	
-	sem_post(sem_barrier1); // Free queue for next in line
+	sem_post(sems[S_SHM]); // Unlock shm
+	
+	sem_post(sems[S_BARRIER1]); // Free queue for next in line
 	
 	// Close Semaphores
-	if (sem_close(sem_request) < 0)
+	if (close_sem_array(sems, SEMS_SIZE) < 0)
 	{
-		perror("SEM close failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	if (sem_close(sem_collect) < 0)
-	{
-		perror("SEM close failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	if (sem_close(sem_shm) < 0)
-	{
-		perror("SEM close failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	if (sem_close(sem_barrier1) < 0)
-	{
-		perror("SEM close failed.\n");
-		exit(EXIT_FAILURE);
-	}
-	if (sem_close(sem_barrier2) < 0)
-	{
-		perror("SEM close failed.\n");
+		perror("SEMs close failed.\n");
 		exit(EXIT_FAILURE);
 	}
 	
