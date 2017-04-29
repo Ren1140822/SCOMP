@@ -17,19 +17,22 @@
 #include "shd_type.h"
 #include <string.h>
 
-#define NUM_SEMS 3
 
-const char *SEM_NAME[NUM_SEMS] = {"sem_mutex2", "sem_r","sem_w"};
+#define NUM_SEMS 6
+
+const char *SEM_NAME[NUM_SEMS] = {"sem_mutex2", "sem_r","sem_w","sem_readers","sem_writers","sem_mutex_writers"};
 const int MUTEX2 =0;
 const int R =1;
 const int W=2;
-
+const int NR_READERS =3;
+const int WRITERS=4;
+const int MUTEX_NR_WRITERS=5;
 
 
 
 
 /*
- * PL 4 - Exercise 10
+ * PL 4 - Exercise 11
  */
 int main(int argc, char *argv[])
 {
@@ -40,7 +43,9 @@ int main(int argc, char *argv[])
 	sems[W] = sem_open(SEM_NAME[W], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[R] = sem_open(SEM_NAME[R], O_CREAT, S_IRUSR|S_IWUSR, 1);
 	sems[MUTEX2] = sem_open(SEM_NAME[MUTEX2],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
-	
+	sems[NR_READERS] = sem_open(SEM_NAME[NR_READERS],  O_CREAT, S_IRUSR|S_IWUSR, 5); 
+	sems[WRITERS] = sem_open(SEM_NAME[WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 0); 
+	sems[MUTEX_NR_WRITERS] = sem_open(SEM_NAME[MUTEX_NR_WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	int i;
 	for (i = 0; i < NUM_SEMS; i++) 
 	{
@@ -74,10 +79,15 @@ int main(int argc, char *argv[])
 	
 	//main loop
 
-	
+	sem_wait(sems[NR_READERS]);//allow only 5 readers
 	while(1)
 	{		
-		
+		int sval;
+		sem_getvalue(sems[WRITERS],&sval);
+		if(sval>2)
+		{
+			sem_wait(sems[MUTEX_NR_WRITERS]);//if more than 2 writers are waiting block the reader
+		}
 		sem_wait(sems[MUTEX2]);
 		
 		sh_data->number_readers++;
@@ -97,14 +107,15 @@ int main(int argc, char *argv[])
 		sh_data->number_readers--;
 		if(sh_data->number_readers==0)
 		{
-				sem_post(sems[R]);//each reader when it finishes reading, decreases the read counter and checks if its 0. if its 0, unblocks this semaphore
+				sem_post(sems[R]);
 		}
 		sem_post(sems[MUTEX2]);
 		
 	}
+	sem_post(sems[NR_READERS]);//when reader finishes cycle, free up a space in the reader queue of 5
 	
 	// Close Semaphore
-	
+
 	for (i = 0; i < NUM_SEMS; i++) // Close & unlink both SEM
 	{
 		// Close Semaphore

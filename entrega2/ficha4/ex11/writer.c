@@ -17,19 +17,20 @@
 #include "shd_type.h"
 #include <string.h>
 
-#define NUM_SEMS 4
+#define NUM_SEMS 6
 
-const char *SEM_NAME[NUM_SEMS] = {"sem_mutex1","sem_mutex3", "sem_r","sem_w"};
+const char *SEM_NAME[NUM_SEMS] = {"sem_mutex1","sem_mutex3", "sem_r","sem_w","sem_writers","sem_mutex_writers"};
 const int MUTEX1 =0;
 const int MUTEX3 =1;
 const int R =2;
 const int W=3;
-
+const int WRITERS=4;
+const int MUTEX_NR_WRITERS=5;
 
 
 
 /*
- * PL 4 - Exercise 10
+ * PL 4 - Exercise 11
  */
 int main(int argc, char *argv[])
 {
@@ -43,7 +44,9 @@ int main(int argc, char *argv[])
 	sems[W] = sem_open(SEM_NAME[W], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[R] = sem_open(SEM_NAME[R], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[MUTEX1] = sem_open(SEM_NAME[MUTEX1],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
-	sems[MUTEX3] = sem_open(SEM_NAME[MUTEX3],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
+	sems[MUTEX3] = sem_open(SEM_NAME[MUTEX3],  O_CREAT, S_IRUSR|S_IWUSR, 1);
+	sems[WRITERS] = sem_open(SEM_NAME[WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 0);
+	sems[MUTEX_NR_WRITERS] = sem_open(SEM_NAME[MUTEX_NR_WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	int i;
 	for (i = 0; i < NUM_SEMS; i++) 
 	{
@@ -54,7 +57,7 @@ int main(int argc, char *argv[])
 		}
 	}
 	// Open shm
-	fd = shm_open(SHM_NAME, O_CREAT|O_EXCL|O_RDWR, S_IRUSR|S_IWUSR);
+	fd = shm_open(SHM_NAME, O_CREAT|O_RDWR, S_IRUSR|S_IWUSR);
 	if (fd < 0)
 	{
 		perror("Error opening shared memory.");
@@ -74,21 +77,23 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	//main loop
+	//main loop: only here to test number of readers functionality
 
 	
 	while(1)
 	{		
-		sem_wait(sems[MUTEX3]);	 //mutual exclusion semaphore, only one writer at the same time.
+		sem_post(sems[WRITERS]);//number of writers waiting
 		
-		sem_wait(sems[R]); // grants acess to the shared memory area, just to check the number of readers.
+		sem_wait(sems[MUTEX3]);	 
+		
+		sem_wait(sems[R]); 
 		 
 		sem_wait(sems[MUTEX1]);
 		
 		sh_data->number_writers++;
 		if(sh_data->number_writers==1)
 		{
-				sem_wait(sems[W]);//each reader when it finishes reading, decreases the read counter and checks if its 0. if its 0, unblocks this semaphore
+				sem_wait(sems[W]);
 		}
 		sem_post(sems[MUTEX1]);
 		sem_post(sems[R]);
@@ -104,12 +109,23 @@ int main(int argc, char *argv[])
 		{
 				sem_post(sems[W]);
 		}
+		//if(sh_data->number_writers<2)
+		//{
+				//sem_post(sems[MUTEX_NR_WRITERS]);
+		//}
 		sem_post(sems[MUTEX1]);
 		
+		sem_wait(sems[WRITERS]);//semaphore that contains the number of current writers
+		int sval;//above commented code would also work
+		sem_getvalue(sems[WRITERS],&sval);
+		if(sval<=2)//if after decreasing the number of writers is less or equal to 2, unblock the readers
+		{
+			sem_post(sems[MUTEX_NR_WRITERS]);
+		}
 	}
 	
 	// Close Semaphore
-	
+
 	for (i = 0; i < NUM_SEMS; i++) // Close & unlink both SEM
 	{
 		// Close Semaphore
