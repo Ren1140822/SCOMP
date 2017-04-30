@@ -16,16 +16,18 @@
 #include <semaphore.h> 
 #include "shd_type.h"
 #include <string.h>
+#include <time.h>
 
-#define NUM_SEMS 6
+#define NUM_SEMS 7
 
-const char *SEM_NAME[NUM_SEMS] = {"sem_mutex1","sem_mutex3", "sem_r","sem_w","sem_writers","sem_mutex_writers"};
+const char *SEM_NAME[NUM_SEMS] = {"sem_mutex1","sem_mutex3", "sem_r","sem_w","sem_writers","sem_mutex_writers","mutex_write"};
 const int MUTEX1 =0;
 const int MUTEX3 =1;
 const int R =2;
 const int W=3;
 const int WRITERS=4;
 const int MUTEX_NR_WRITERS=5;
+const int MUTEX_WRITE=6;
 const int LOOPS_NUMBER = 100000;
 
 
@@ -39,14 +41,16 @@ int main(int argc, char *argv[])
 	int fd, data_size = sizeof(shd_type);
 	shd_type *sh_data;
 	sem_t *sems[NUM_SEMS];
-	
+	time_t rawtime;
+	struct tm * timeinfo;
 	
 	sems[W] = sem_open(SEM_NAME[W], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[R] = sem_open(SEM_NAME[R], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[MUTEX1] = sem_open(SEM_NAME[MUTEX1],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	sems[MUTEX3] = sem_open(SEM_NAME[MUTEX3],  O_CREAT, S_IRUSR|S_IWUSR, 1);
 	sems[WRITERS] = sem_open(SEM_NAME[WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 0);
-	sems[MUTEX_NR_WRITERS] = sem_open(SEM_NAME[MUTEX_NR_WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
+	sems[MUTEX_NR_WRITERS] = sem_open(SEM_NAME[MUTEX_NR_WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 1);
+	sems[MUTEX_WRITE] = sem_open(SEM_NAME[MUTEX_WRITE],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	int i;
 	for (i = 0; i < NUM_SEMS; i++) 
 	{
@@ -85,28 +89,33 @@ int main(int argc, char *argv[])
 		
 		sem_wait(sems[MUTEX3]);	 
 		
-		sem_wait(sems[R]); 
+		sem_wait(sems[W]); 
 		 
 		sem_wait(sems[MUTEX1]);
 		
 		sh_data->number_writers++;
 		if(sh_data->number_writers==1)
 		{
-				sem_wait(sems[W]);
+				sem_wait(sems[R]);
 		}
 		sem_post(sems[MUTEX1]);
-		sem_post(sems[R]);
+		sem_post(sems[W]);
 		sem_post(sems[MUTEX3]);	
 		
 		
-		sprintf(sh_data->string,"%d",((int)getpid()));
+		sem_wait(sems[MUTEX_WRITE]);//could use another already defined mutex, using a new one to make it clearer to read
+		time ( &rawtime );
+		timeinfo = localtime ( &rawtime );
+		sprintf(sh_data->string,"%d\n",(int)getpid());
+		strcat(sh_data->string,asctime (timeinfo));
 		printf("Number of readers is %d.\n",sh_data->number_readers);
 		printf("Number of writers is %d.\n",sh_data->number_writers);
+		sem_post(sems[MUTEX_WRITE]);
 		sem_wait(sems[MUTEX1]);
 		sh_data->number_writers--;
 		if(sh_data->number_writers==0)
 		{
-				sem_post(sems[W]);
+				sem_post(sems[R]);
 		}
 		//if(sh_data->number_writers<2)
 		//{

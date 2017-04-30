@@ -16,15 +16,17 @@
 #include <semaphore.h> 
 #include "shd_type.h"
 #include <string.h>
+#include <time.h>
 
-#define NUM_SEMS 4
+#define NUM_SEMS 5
 
-const char *SEM_NAME[NUM_SEMS] = {"sem_mutex1","sem_mutex3", "sem_r","sem_w"};
+const char *SEM_NAME[NUM_SEMS] = {"sem_mutex1","sem_mutex3", "sem_r","sem_w","mutex_write"};
 const int MUTEX1 =0;
 const int MUTEX3 =1;
 const int R =2;
 const int W=3;
-
+const int MUTEX_WRITE =4;
+const int LOOPS_NUMBER = 100000;
 
 
 
@@ -45,6 +47,7 @@ int main(int argc, char *argv[])
 	sems[R] = sem_open(SEM_NAME[R], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[MUTEX1] = sem_open(SEM_NAME[MUTEX1],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	sems[MUTEX3] = sem_open(SEM_NAME[MUTEX3],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
+	sems[MUTEX_WRITE] = sem_open(SEM_NAME[MUTEX_WRITE],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	int i;
 	for (i = 0; i < NUM_SEMS; i++) 
 	{
@@ -78,35 +81,36 @@ int main(int argc, char *argv[])
 	//main loop
 
 	
-	while(1)
-	{		
+	int nr;
+	for (nr = 0; nr < LOOPS_NUMBER; nr++) 
+	{			
 		sem_wait(sems[MUTEX3]);	 //mutual exclusion semaphore, only one writer at the same time.
 		
-		sem_wait(sems[R]); 
+		sem_wait(sems[W]); 
 		 
 		sem_wait(sems[MUTEX1]);
 		
 		sh_data->number_writers++;
-		if(sh_data->number_writers==1)
+		if(sh_data->number_writers==1)//if nr of writers is 1
 		{
-				sem_wait(sems[W]);
+				sem_wait(sems[R]);
 		}
 		sem_post(sems[MUTEX1]);
-		sem_post(sems[R]);
+		sem_post(sems[W]);
 		sem_post(sems[MUTEX3]);	
-		
-		time ( &rawtime );
-		timeinfo = localtime ( &rawtime );
-		
-		sprintf(sh_data->string,"%d\n",((int)getpid()));
+		sem_wait(sems[MUTEX_WRITE]);
+		time(&rawtime);
+		timeinfo = localtime(&rawtime);
+		sprintf(sh_data->string,"%d\n",(int)getpid());
 		strcat(sh_data->string,asctime (timeinfo));
 		printf("Number of readers is %d.\n",sh_data->number_readers);
 		printf("Number of writers is %d.\n",sh_data->number_writers);
+		sem_post(sems[MUTEX_WRITE]);
 		sem_wait(sems[MUTEX1]);
 		sh_data->number_writers--;
 		if(sh_data->number_writers==0)
 		{
-				sem_post(sems[W]);
+				sem_post(sems[R]);
 		}
 		sem_post(sems[MUTEX1]);
 		

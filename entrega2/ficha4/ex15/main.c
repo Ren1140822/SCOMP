@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 	int option,sval;
 	scanf("%d",&option);
 	int nr;
-	for (nr = 0; nr < LOOPS_NUMBER; nr++) //main loop
+	for (nr = 0; nr < LOOPS_NUMBER; nr++) //main loop: before, it was while(1)
 	{			
 		if(option==1)
 		{

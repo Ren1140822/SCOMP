@@ -18,15 +18,16 @@
 #include <string.h>
 
 
-#define NUM_SEMS 6
+#define NUM_SEMS 7
 
-const char *SEM_NAME[NUM_SEMS] = {"sem_mutex2", "sem_r","sem_w","sem_readers","sem_writers","sem_mutex_writers"};
+const char *SEM_NAME[NUM_SEMS] = {"sem_mutex2", "sem_r","sem_w","sem_readers","sem_writers","sem_mutex_writers","mutex_write"};
 const int MUTEX2 =0;
 const int R =1;
 const int W=2;
 const int NR_READERS =3;
 const int WRITERS=4;
 const int MUTEX_NR_WRITERS=5;
+const int MUTEX_WRITE=6;
 const int LOOPS_NUMBER = 100000;
 
 
@@ -46,6 +47,7 @@ int main(int argc, char *argv[])
 	sems[NR_READERS] = sem_open(SEM_NAME[NR_READERS],  O_CREAT, S_IRUSR|S_IWUSR, 5); 
 	sems[WRITERS] = sem_open(SEM_NAME[WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 0); 
 	sems[MUTEX_NR_WRITERS] = sem_open(SEM_NAME[MUTEX_NR_WRITERS],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
+	sems[MUTEX_WRITE] = sem_open(SEM_NAME[MUTEX_WRITE],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	int i;
 	for (i = 0; i < NUM_SEMS; i++) 
 	{
@@ -87,27 +89,30 @@ int main(int argc, char *argv[])
 		if(sval>2)
 		{
 			sem_wait(sems[MUTEX_NR_WRITERS]);//if more than 2 writers are waiting block the reader
+			
 		}
 		sem_wait(sems[MUTEX2]);
 		
 		sh_data->number_readers++;
 		if(sh_data->number_readers==1)
 		{
-				sem_wait(sems[R]);//if its the first reader blocks the writer
+				sem_wait(sems[W]);//if its the first reader blocks the writer
+				sem_wait(sems[MUTEX_WRITE]);
 		}
 		sem_post(sems[MUTEX2]);
 		
-		sem_wait(sems[W]);
+		
 		printf("Read: %s.\n", sh_data->string);
 		printf("Number of readers is %d.\n",sh_data->number_readers);
-		sem_post(sems[W]);
+		
 		
 		sem_wait(sems[MUTEX2]);
 		
 		sh_data->number_readers--;
 		if(sh_data->number_readers==0)
 		{
-				sem_post(sems[R]);
+				sem_post(sems[W]);
+				sem_post(sems[MUTEX_WRITE]);
 		}
 		sem_post(sems[MUTEX2]);
 		
