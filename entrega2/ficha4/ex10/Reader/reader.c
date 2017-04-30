@@ -17,13 +17,14 @@
 #include "shd_type.h"
 #include <string.h>
 
-#define NUM_SEMS 3
+#define NUM_SEMS 4
 
-const char *SEM_NAME[NUM_SEMS] = {"sem_mutex2", "sem_r","sem_w"};
+const char *SEM_NAME[NUM_SEMS] = {"sem_mutex2", "sem_r","sem_w","mutex_write"};
 const int MUTEX2 =0;
 const int R =1;
 const int W=2;
-
+const int MUTEX_WRITE=3;
+const int LOOPS_NUMBER = 100000;
 
 
 
@@ -40,7 +41,7 @@ int main(int argc, char *argv[])
 	sems[W] = sem_open(SEM_NAME[W], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[R] = sem_open(SEM_NAME[R], O_CREAT, S_IRUSR|S_IWUSR, 1);
 	sems[MUTEX2] = sem_open(SEM_NAME[MUTEX2],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
-	
+	sems[MUTEX_WRITE] = sem_open(SEM_NAME[MUTEX_WRITE],  O_CREAT, S_IRUSR|S_IWUSR, 1); 
 	int i;
 	for (i = 0; i < NUM_SEMS; i++) 
 	{
@@ -75,29 +76,32 @@ int main(int argc, char *argv[])
 	//main loop
 
 	
-	while(1)
+	int nr;
+	for (nr = 0; nr < LOOPS_NUMBER; nr++) 
 	{		
-		
 		sem_wait(sems[MUTEX2]);
 		
 		sh_data->number_readers++;
 		if(sh_data->number_readers==1)
 		{
-				sem_wait(sems[R]);//if its the first reader blocks the writer
+				sem_wait(sems[W]);//if its the first reader blocks the writer
+				sem_wait(sems[MUTEX_WRITE]);
 		}
 		sem_post(sems[MUTEX2]);
 		
-		sem_wait(sems[W]);
+		
 		printf("Read: %s.\n", sh_data->string);
 		printf("Number of readers is %d.\n",sh_data->number_readers);
-		sem_post(sems[W]);
+		
 		
 		sem_wait(sems[MUTEX2]);
 		
 		sh_data->number_readers--;
 		if(sh_data->number_readers==0)
 		{
-				sem_post(sems[R]);//each reader when it finishes reading, decreases the read counter and checks if its 0. if its 0, unblocks this semaphore
+				sem_post(sems[W]);//each reader when it finishes reading, decreases the read counter and checks if its 0. if its 0, unblocks this semaphore
+				sem_post(sems[MUTEX_WRITE]);
+				printf("Writer will enter.\n");
 		}
 		sem_post(sems[MUTEX2]);
 		
