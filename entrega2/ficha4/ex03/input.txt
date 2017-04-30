@@ -1,0 +1,14 @@
+/***************** EX03 : FILE ***************/
+
+Eu sou o processo com o PID 5339.
+Eu sou o processo com o PID 5343.
+Eu sou o processo com o PID 5350.
+Eu sou o processo com o PID 5354.
+Eu sou o processo com o PID 5371.
+Eu sou o processo com o PID 5714.
+Eu sou o processo com o PID 5721.
+Eu sou o processo com o PID 5728.
+Eu sou o processo com o PID 5732.
+Eu sou o processo com o PID 5744.
+Eu sou o processo com o PID 5751.
+Eu sou o processo com o PID 5761.
