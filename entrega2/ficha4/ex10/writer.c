@@ -38,7 +38,8 @@ int main(int argc, char *argv[])
 	int fd, data_size = sizeof(shd_type);
 	shd_type *sh_data;
 	sem_t *sems[NUM_SEMS];
-	
+	time_t rawtime;
+	struct tm * timeinfo;
 	
 	sems[W] = sem_open(SEM_NAME[W], O_CREAT , S_IRUSR|S_IWUSR, 1);
 	sems[R] = sem_open(SEM_NAME[R], O_CREAT , S_IRUSR|S_IWUSR, 1);
@@ -94,8 +95,11 @@ int main(int argc, char *argv[])
 		sem_post(sems[R]);
 		sem_post(sems[MUTEX3]);	
 		
+		time ( &rawtime );
+		timeinfo = localtime ( &rawtime );
 		
-		sprintf(sh_data->string,"%d",((int)getpid()));
+		sprintf(sh_data->string,"%d\n",((int)getpid()));
+		strcat(sh_data->string,asctime (timeinfo));
 		printf("Number of readers is %d.\n",sh_data->number_readers);
 		printf("Number of writers is %d.\n",sh_data->number_writers);
 		sem_wait(sems[MUTEX1]);
