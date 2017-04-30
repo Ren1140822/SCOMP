@@ -45,10 +45,6 @@ const int NUM_TICKETS = 10;
  */
 int main(int argc, char *argv[])
 {
-	// Print something
-	printf("\nThe THEATER is open!\n");
-	fflush(stdout);
-	
 	// Open semaphores
 	sem_t *sems[SEMS_SIZE];
 	int sem_values[SEMS_SIZE] = { 0, 0, 1, 1, 0, 0 };
@@ -82,6 +78,10 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 
+	// Print something
+	printf("\nThe THEATER is open!\n");
+	fflush(stdout);
+
 	// Ticket counter
 	int first_ticket = FIRST_TICKET;
 	int counter = 0;
@@ -101,7 +101,9 @@ int main(int argc, char *argv[])
 		
 		sem_post(sems[S_COLLECT]); // Unlock ticket collection 
 		
-	} while(counter <= NUM_TICKETS);
+	} while(counter < NUM_TICKETS);
+	
+	printf("Out of tickets, please try later.\n");
 	
 	// Close Semaphores
 	if (close_sem_array(sems, SEMS_SIZE) < 0)

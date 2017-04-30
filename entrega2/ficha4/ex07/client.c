@@ -99,7 +99,6 @@ int main(int argc, char *argv[])
 			be_served = 1;
 		}
 		
-		// Wait for all clients that have waiting tickets
 		// to pass first barrier and then close barrier 1 & open barrier 2
 		/**************************************************************/
 		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
@@ -111,10 +110,10 @@ int main(int argc, char *argv[])
 		
 		if ( num_clients == (shm->waiting_ticket - shm->next) ) // Check if last client is between barriers
 		{
+			sem_wait(sems[S_QUEUE]); // Decrement by 1 queue
 			sem_wait(sems[S_BARRIER1]); // Close barrier 1
 			sem_post(sems[S_BARRIER2]); // Open barrier 2
 		}
-		
 		/***************** CRITICAL SECTION ***************************/
 		sem_post(sems[S_SHM]); // Unlock shm
 		/**************************************************************/
