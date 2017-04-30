@@ -27,6 +27,7 @@ const int NR_SEM_PROCESS1 =3;
 const int NR_SEM_PROCESS2 =4;
 const int NR_SEM_PROCESS3 =5;
 const int MUTEX =6;
+const int LOOPS_NUMBER = 20;
 
 /*
  * PL 4 - Exercise 12
@@ -50,8 +51,8 @@ int main(int argc, char *argv[])
 	}
 	int seq;
 	seq = create_childs(2);
-	
-	while(1)
+	int nr;
+	for (nr = 0; nr < LOOPS_NUMBER; nr++) 
 	{
 		//application logic
 		if(seq==0)

@@ -25,7 +25,7 @@ const int WEST_EAST =1;
 const int CROSS_TIME=10;
 const int MUTEX=2;
 const int SLEEP_TIME=3;
-
+const int LOOPS_NUMBER = 100;
 
 
 
@@ -57,8 +57,9 @@ int main(int argc, char *argv[])
 	printf("Press 1 to cross from east to west, 2 to cross from west to east.\n");
 	int option,sval;
 	scanf("%d",&option);
-	while(1)
-	{
+	int nr;
+	for (nr = 0; nr < LOOPS_NUMBER; nr++) //main loop
+	{			
 		if(option==1)
 		{
 			sem_wait(sems[MUTEX]);//mutex to guarantee value is real - one process might process this line milliseconds before the other process posts the east_west sempahore, so it should be invalid
@@ -79,7 +80,8 @@ int main(int argc, char *argv[])
 				sleep(SLEEP_TIME);//not to syncronize anything, just to slow the message spam!!!
 			}
 		}
-		else{
+		else
+		{
 			if(option==2)
 			{
 				sem_wait(sems[MUTEX]);

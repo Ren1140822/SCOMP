@@ -82,14 +82,14 @@ int main(int argc, char *argv[])
 	{		
 		sem_wait(sems[MUTEX3]);	 //mutual exclusion semaphore, only one writer at the same time.
 		
-		sem_wait(sems[R]); // grants acess to the shared memory area, just to check the number of readers.
+		sem_wait(sems[R]); 
 		 
 		sem_wait(sems[MUTEX1]);
 		
 		sh_data->number_writers++;
 		if(sh_data->number_writers==1)
 		{
-				sem_wait(sems[W]);//each reader when it finishes reading, decreases the read counter and checks if its 0. if its 0, unblocks this semaphore
+				sem_wait(sems[W]);
 		}
 		sem_post(sems[MUTEX1]);
 		sem_post(sems[R]);

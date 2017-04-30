@@ -26,7 +26,7 @@ const int R =2;
 const int W=3;
 const int WRITERS=4;
 const int MUTEX_NR_WRITERS=5;
-
+const int LOOPS_NUMBER = 100000;
 
 
 /*
@@ -78,9 +78,8 @@ int main(int argc, char *argv[])
 	}
 	
 	//main loop: only here to test number of readers functionality
-
-	
-	while(1)
+	int nr;
+	for (nr = 0; nr < LOOPS_NUMBER; nr++) 
 	{		
 		sem_post(sems[WRITERS]);//number of writers waiting
 		

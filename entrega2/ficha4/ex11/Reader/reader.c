@@ -27,7 +27,7 @@ const int W=2;
 const int NR_READERS =3;
 const int WRITERS=4;
 const int MUTEX_NR_WRITERS=5;
-
+const int LOOPS_NUMBER = 100000;
 
 
 
@@ -77,11 +77,11 @@ int main(int argc, char *argv[])
 		exit(EXIT_FAILURE);
 	}
 	
-	//main loop
-
+	
 	sem_wait(sems[NR_READERS]);//allow only 5 readers
-	while(1)
-	{		
+	int nr;
+	for (nr = 0; nr < LOOPS_NUMBER; nr++) //main loop
+	{			
 		int sval;
 		sem_getvalue(sems[WRITERS],&sval);
 		if(sval>2)
