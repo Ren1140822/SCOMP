@@ -30,7 +30,7 @@ const int LOOPS_NUMBER = 100;
 
 
 /*
- * PL 4 - Exercise 15
+ * PL 4 - Exercise 15 - ONLY ONE DIRECTION AT A TIME IN THE BRIDGE. MORE THAN ONE CAR CAN CROSS IF THEY'RE IN THE SAME DIRECTION
  */
 int main(int argc, char *argv[])
 {
@@ -71,6 +71,7 @@ int main(int argc, char *argv[])
 				printf("Crossing east to west.\n");
 				sleep(CROSS_TIME);
 				sem_wait(sems[EAST_WEST]);//after we finish crossing, we decrease the semaphore's value by 1
+				printf("Crossed.\n");
 				break;
 			}
 			else
@@ -93,6 +94,7 @@ int main(int argc, char *argv[])
 					printf("Crossing west to east.\n");
 					sleep(CROSS_TIME);
 					sem_wait(sems[WEST_EAST]);
+					printf("Crossed.\n");
 					break;
 				}
 				else
