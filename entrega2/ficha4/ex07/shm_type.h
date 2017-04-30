@@ -19,7 +19,6 @@ typedef struct
 	unsigned int ticket; // Next ticket to sell
 	unsigned int waiting_ticket; // Next waiting ticket
 	unsigned int next; // Next client to be atended
-	unsigned int queue_size; // Size of the waiting line
 }
 shm_type;
 
