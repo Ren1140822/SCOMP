@@ -1,0 +1,69 @@
+/*
+ * Daniel Goncalves > 1151452@isep.ipp.pt
+ * SCOMP - Turma 2DD
+ * 
+ * sem_array.c
+ * 
+ */
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <wait.h>
+#include <sys/mman.h>
+#include <sys/stat.h>        /* For mode constants */
+#include <fcntl.h>           /* For O_* constants */
+#include <semaphore.h> 
+
+// Constants
+const char *SEM_NAME = "sem_no_";
+const size_t BUFF_SIZE = 81;
+
+sem_t **create_sem_array(sem_t **sems, size_t SIZE, int oflag, int *sem_values, int name_multiplier)
+{
+	int i;
+	for (i = 0; i < SIZE; i++)
+	{
+		// Create SEM name
+		char tmp[BUFF_SIZE];
+		snprintf(tmp, BUFF_SIZE, "%s%d", SEM_NAME, ((i+1) + name_multiplier));
+		// Open SEM
+		sems[i] = sem_open(tmp, oflag, S_IRUSR|S_IWUSR, (sem_values == NULL) ? 0 : sem_values[i] );
+		if (sems[i] == SEM_FAILED)
+		{
+			return NULL;
+		}
+	}
+	return sems;
+}
+
+int close_sem_array(sem_t **sems, size_t SIZE)
+{
+	int i;
+	for (i = 0; i < SIZE; i++)
+	{
+		// Close Semaphore
+		if (sem_close(sems[i]) < 0)
+		{
+			return -1;
+		}
+	}
+	return 0;
+}
+
+int unlink_sem_array(sem_t **sems, size_t SIZE, int name_multiplier)
+{
+	int i;
+	for (i = 0; i < SIZE; i++)
+	{
+		// Create SEM name
+		char tmp[BUFF_SIZE];
+		snprintf(tmp, BUFF_SIZE, "%s%d", SEM_NAME, ((i+1) + name_multiplier));
+		// Unlink Semaphore
+		if (sem_unlink(tmp) < 0)
+		{
+			return -1;
+		}
+	}
+	return 0;
+}
