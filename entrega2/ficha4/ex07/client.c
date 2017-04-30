@@ -19,7 +19,7 @@
 #include "shm_type.h"
 
 // Setting constants
-#define SEMS_SIZE 5
+#define SEMS_SIZE 6
 
 const int S_REQUEST = 0; 	// semaphore to request a ticket (by occurence of events)
 
@@ -34,6 +34,8 @@ const int S_BARRIER2 = 4;	// semaphore as a barrier so that only when all proces
 							// have a waiting ticket pass the first barrier. This is to avoid the
 							// possibility of one process controlling the barrier and entering a deadlock (by occurence of events)
 
+const int S_QUEUE = 5; 		// semaphore to control a queue
+
 const int MIN_WAIT = 1;
 const int MAX_WAIT = 10;
 
@@ -43,7 +45,7 @@ const int MAX_WAIT = 10;
 int main(int argc, char *argv[])
 {
 	// Open semaphores
-	int sem_values[SEMS_SIZE] = { 0, 0, 1, 1, 0 };
+	int sem_values[SEMS_SIZE] = { 0, 0, 1, 1, 0, 0 };
 	sem_t *sems[SEMS_SIZE];
 	if (create_sem_array(sems, SEMS_SIZE, O_EXCL, sem_values) == NULL)
 	{
@@ -87,57 +89,62 @@ int main(int argc, char *argv[])
 	sem_post(sems[S_SHM]); // Unlock shm
 	
 	// Waiting mechanism
-	unsigned int be_served = 0, next_ticket;
+	unsigned int be_served = 0;
 	while (!be_served)
 	{
 		sem_wait(sems[S_BARRIER1]); sem_post(sems[S_BARRIER1]); // first barrier to block clients in queue
 		
-		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
-		next_ticket = shm->next; // Next waiting ticket
-		sem_post(sems[S_SHM]); // Unlock shm
-		
-		if (waiting_ticket == next_ticket) // Check if it's his turn
+		if (waiting_ticket == shm->next) // Check if it's his turn
 		{
 			be_served = 1;
 		}
-		// Increment queue size
-		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
-		(shm->queue_size)++;
-		sem_post(sems[S_SHM]); // Unlock shm
 		
 		// Wait for all clients that have waiting tickets
-		// to pass first barrier
-		if (shm->queue_size == ((shm->waiting_ticket - shm->next)))
+		// to pass first barrier and then close barrier 1 & open barrier 2
+		/**************************************************************/
+		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
+		/***************** CRITICAL SECTION ***************************/
+		sem_post(sems[S_QUEUE]); // Increment queue
+		
+		int num_clients; 
+		sem_getvalue(sems[S_QUEUE], &num_clients); // Get number of clients in queue
+		
+		if ( num_clients == (shm->waiting_ticket - shm->next) ) // Check if last client is between barriers
 		{
-			sem_wait(sems[S_BARRIER1]); // Close first barrier
-			sem_post(sems[S_BARRIER2]);
+			sem_wait(sems[S_BARRIER1]); // Close barrier 1
+			sem_post(sems[S_BARRIER2]); // Open barrier 2
 		}
-		sem_wait(sems[S_BARRIER2]); sem_post(sems[S_BARRIER2]); // second barrier to wait for all waiting clients before proceeding
+		
+		/***************** CRITICAL SECTION ***************************/
+		sem_post(sems[S_SHM]); // Unlock shm
+		/**************************************************************/
+		
+		sem_wait(sems[S_BARRIER2]); sem_post(sems[S_BARRIER2]); // second barrier block waiting clients before proceeding
+		/** This barrier prevents that 1 process can enter an infinite loop by being always the 
+		 * first to pass the barrier 1 and not being the next to be served**/
 		
 		// Decrement queue size
-		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
-		(shm->queue_size)--;
-		sem_post(sems[S_SHM]); // Unlock shm
-		
-		// Wait for all clients that were in between barriers
-		// to pass second barrier
-		if (shm->queue_size == 0)
+		if (sem_trywait(sems[S_QUEUE]) < 0) // Last client passing the barrier 2 closes barrier 2
 		{
-			sem_wait(sems[S_BARRIER2]); // Close second barrier
+			sem_wait(sems[S_BARRIER2]); // Close barrier 2
 		}
 	}
+	
 	// Purchase ticket
 	sem_post(sems[S_REQUEST]); // Request ticket
 	
 	sem_wait(sems[S_COLLECT]); // Collect ticket
 	
-	sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
+	sleep(time_at_balcony); // Time at the balcony
 	
-	sleep(time_at_balcony); // Time in the balcony
+	/**************************************************************/
+	sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
+	/***************** CRITICAL SECTION ***************************/
 	printf("My ticket number: %d (time at balcony: %d | waiting ticket #%d)\n", shm->ticket, time_at_balcony, waiting_ticket); // Print ticket
 	(shm->next)++; // Next waiting ticket
-	
+	/***************** CRITICAL SECTION ***************************/
 	sem_post(sems[S_SHM]); // Unlock shm
+	/**************************************************************/
 	
 	sem_post(sems[S_BARRIER1]); // Free queue for next in line
 	

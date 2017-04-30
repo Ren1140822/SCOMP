@@ -19,7 +19,7 @@
 #include "shm_type.h"
 
 // Setting constants
-#define SEMS_SIZE 5
+#define SEMS_SIZE 6
 
 const int S_REQUEST = 0; 	// semaphore to request a ticket (by occurence of events)
 
@@ -34,6 +34,7 @@ const int S_BARRIER2 = 4;	// semaphore as a barrier so that only when all proces
 							// have a waiting ticket pass the first barrier. This is to avoid the
 							// possibility of one process controlling the barrier and entering a deadlock (by occurence of events)
 
+const int S_QUEUE = 5; 		// semaphore to control a queue
 
 const int FIRST_TICKET = 1000;
 const int NUM_TICKETS = 10;
@@ -50,7 +51,7 @@ int main(int argc, char *argv[])
 	
 	// Open semaphores
 	sem_t *sems[SEMS_SIZE];
-	int sem_values[SEMS_SIZE] = { 0, 0, 1, 1, 0 };
+	int sem_values[SEMS_SIZE] = { 0, 0, 1, 1, 0, 0 };
 	if (create_sem_array(sems, SEMS_SIZE, O_CREAT|O_EXCL, sem_values) == NULL)
 	{
 		perror("Semaphore failed.\n");
@@ -87,11 +88,14 @@ int main(int argc, char *argv[])
 	
 	do {
 		sem_wait(sems[S_REQUEST]); // Wait for ticket request
-		
+		/**************************************************************/
 		sem_wait(sems[S_SHM]); // Wait for exclusive access to shm
+		/***************** CRITICAL SECTION ***************************/
 		// Issue ticket
 		shm->ticket = first_ticket + counter;
+		/**************************************************************/
 		sem_post(sems[S_SHM]); // Unlock shm
+		/***************** CRITICAL SECTION ***************************/
 		
 		counter++; // next ticket
 		
@@ -105,7 +109,6 @@ int main(int argc, char *argv[])
 		perror("SEMs close failed.\n");
 		exit(EXIT_FAILURE);
 	}
-	
 	// Unlink Semaphores
 	if (unlink_sem_array(sems, SEMS_SIZE) < 0)
 	{
