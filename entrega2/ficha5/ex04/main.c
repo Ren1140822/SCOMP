@@ -21,8 +21,8 @@
 #define DB_SIZE 10000
 #define KEY_SIZE 5
 #define NUM_THREADS 10
-#define MAX_NUM 49 // inclusive
-#define MIN_NUM 0 // exclusive
+#define MAX_NUM 49
+#define MIN_NUM 1
 
 // Error constants
 const int THREAD_CREATE_ERROR = -1;
@@ -47,12 +47,21 @@ int main(void)
 	/* Intializes random seed */
 	srand((unsigned) getpid());
 	// Fill db with random keys 
-	int i, j;
+	int i, j, k;
 	for (i = 0; i <= DB_SIZE; i++)
 	{
 		for (j = 0; j < KEY_SIZE; j++)
 		{
 			db[i][j] = (rand() % MAX_NUM) + MIN_NUM;
+			// Verify if key already contains the assigned number 
+			// (if true assign new number)
+			for (k = 0; k < j; k++)
+			{
+				if (db[i][k] == db[i][j])
+				{
+					j--; // reset to the same index
+				}
+			}
 		}
 	}
 	// Init mutexs
@@ -116,7 +125,7 @@ void *statistics(void *param)
 	{
 		for (j = 0; j < KEY_SIZE; j++)
 		{
-			int number = db[i][j];
+			int number = db[i][j] - 1; // index 0 -> number 1
 			// "fecha" a variável mutex do number em questão.
 			// Se já estiver "fechada" espera até
 			// que seja possível fechar.
