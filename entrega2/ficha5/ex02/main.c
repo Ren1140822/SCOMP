@@ -20,6 +20,12 @@
 // Setting constants
 #define SIZE 1000
 #define NUM_THREADS 5
+
+// Error constants
+const int THREAD_CREATE_ERROR = -1;
+const int THREAD_JOIN_ERROR = -2;
+const int THREAD_EXIT_ERROR = -3;
+
 // Info Struct
 typedef struct
 {
@@ -28,6 +34,7 @@ typedef struct
 	int thread_no;
 }
 param;
+
 // thread function
 void *find(void *params);
 
@@ -47,9 +54,9 @@ int main(int argc, char **argv)
 	}
 	// Fill vec info 
 	int i;
-	for (i = 0; i <= SIZE; i++)
+	for (i = 0; i < SIZE; i++)
 	{
-		vec[i] = i+1;
+		vec[i] = i + 1;
 	}
 	// Create Threads
 	pthread_t threads[NUM_THREADS];
@@ -62,22 +69,25 @@ int main(int argc, char **argv)
 		if (pthread_create(&threads[i], NULL, find, (void *) &params[i]) != 0) 
 		{
 			perror("Create thread failed.\n");
-			exit(-1);
+			exit(THREAD_CREATE_ERROR);
 		}
 	}
-	
+	// Joins with each terminated thread (by array order)
 	int *ret;
 	int ret_val = -1;
-	for (i = 0; i <= NUM_THREADS; i++)
+	for (i = 0; i < NUM_THREADS; i++)
 	{
-		pthread_join(threads[i], (void *) &ret); // Joins with each terminated thread (by array order)
+		if (pthread_join(threads[i], (void *) &ret) != 0) 
+		{
+			perror("Join thread failed.\n");
+			exit(THREAD_JOIN_ERROR);
+		}
 		if (ret != NULL)
 		{
 			ret_val = *ret;
 		}
 		free(ret);
 	}
-	
 	// Print result
 	printf("\n********************************************\n\n");
 	if (ret_val == -1)
