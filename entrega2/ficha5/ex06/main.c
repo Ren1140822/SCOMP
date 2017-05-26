@@ -103,6 +103,8 @@ int main(void)
 		}
 		// Print arrival message
 		puts(journey_string);
+		// free memory
+		free(journey_string);
 	}
 	return 0;
 }
@@ -135,8 +137,8 @@ void *travel(void *param)
 		printf("[Train #%02d] [Origin: %s | Destination: %s] [LINE: %s]\n", 
 		info.train_number, info.origin, info.destination, line_string);
 		// Simulate journey duration
-		sleep((rand() % MAX_NUM) + MIN_NUM);
-		// sleep(3); // [TESTING] If mutex is working one journey should 3 more seconds
+		// sleep((rand() % MAX_NUM) + MIN_NUM);
+		sleep(3); // [TESTING] If mutex is working one journey should 3 more seconds
 		pthread_mutex_unlock(&mutexs[current_line]); // Unlocks intersection
 	}
 	// Save arrival time
