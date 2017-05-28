@@ -26,7 +26,7 @@
 #define NUMBER_PRODUCTS 15
 #define H_NUMBER 3
 
-int  total;
+//global vars
 data market_data[H_NUMBER];
 info information[NUMBER_PRODUCTS];
 info vec1[NUMBER_PRODUCTS];

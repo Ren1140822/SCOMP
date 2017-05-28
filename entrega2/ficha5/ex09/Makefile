@@ -8,9 +8,9 @@
 #
 
 # Variables
-INCLUDES = 
-SOURCES = main.c 
-OBJFILES = main.o 
+INCLUDES = generate_random.h
+SOURCES = main.c generate_random.c
+OBJFILES = main.o generate_random.o
 EXEC = exec
 
 ${EXEC}: ${OBJFILES}

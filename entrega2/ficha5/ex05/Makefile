@@ -8,9 +8,9 @@
 #
 
 # Variables
-INCLUDES = thread_func.h
-SOURCES = main.c thread_func.c
-OBJFILES = main.o thread_func.o
+INCLUDES =
+SOURCES = main.c
+OBJFILES = main.o
 EXEC = exec
 
 ${EXEC}: ${OBJFILES}
