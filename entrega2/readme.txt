@@ -21,3 +21,5 @@ c) Estrutura de diretórios na raiz do repositório:
 Submission closed for class entrega2
 
 Submission closed for class entrega2
+
+Submission closed for class entrega2
